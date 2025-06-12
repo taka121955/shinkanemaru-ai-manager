@@ -1,28 +1,21 @@
 import random
 
-# 的中率・勝率重視のAI予想（サンプル実装）
-def get_ai_predictions():
-    # サンプル：12レース分の的中率・勝率
-    race_data = [
-        {"競艇場": "住之江", "レース": "1R", "的中率": 0.78, "勝率": 0.74},
-        {"競艇場": "住之江", "レース": "2R", "的中率": 0.62, "勝率": 0.60},
-        {"競艇場": "住之江", "レース": "3R", "的中率": 0.55, "勝率": 0.51},
-        {"競艇場": "住之江", "レース": "4R", "的中率": 0.45, "勝率": 0.50},
-        {"競艇場": "住之江", "レース": "5R", "的中率": 0.60, "勝率": 0.40},
-        {"競艇場": "住之江", "レース": "6R", "的中率": 0.52, "勝率": 0.53},
-        {"競艇場": "住之江", "レース": "7R", "的中率": 0.65, "勝率": 0.48},
-        {"競艇場": "住之江", "レース": "8R", "的中率": 0.70, "勝率": 0.60},
-        {"競艇場": "住之江", "レース": "9R", "的中率": 0.75, "勝率": 0.69},
-        {"競艇場": "住之江", "レース": "10R", "的中率": 0.68, "勝率": 0.65},
-        {"競艇場": "住之江", "レース": "11R", "的中率": 0.71, "勝率": 0.72},
-        {"競艇場": "住之江", "レース": "12R", "的中率": 0.67, "勝率": 0.70},
-    ]
-
-    # 的中率 × 60% + 勝率 × 40% でスコア算出
-    for race in race_data:
-        race["score"] = race["的中率"] * 0.6 + race["勝率"] * 0.4
-
-    sorted_data = sorted(race_data, key=lambda x: x["score"], reverse=True)
-
-    # 上位3レースを返す（例）
-    return sorted_data[:3]
+def generate_ai_predictions():
+    race_data = []
+    venues = ["住之江", "尼崎", "大村", "戸田", "唐津"]
+    rounds = [f"{r}R" for r in range(1, 13)]
+    boats = ["1号艇", "2号艇", "3号艇", "4号艇", "5号艇", "6号艇"]
+    for _ in range(5):
+        venue = random.choice(venues)
+        round_ = random.choice(rounds)
+        boat = random.choice(boats)
+        score = round(random.uniform(0.65, 0.95), 2)
+        race_data.append({
+            "競艇場": venue,
+            "レース": round_,
+            "式別": "単勝",
+            "艇番": boat,
+            "スコア": score
+        })
+    race_data.sort(key=lambda x: x["スコア"], reverse=True)
+    return race_data
