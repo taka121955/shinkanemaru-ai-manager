@@ -1,16 +1,14 @@
 import streamlit as st
 import pandas as pd
 import datetime
-import random
 from utils.ecp import get_next_bet_amount
 
-# タイトルと現在時刻（日本時間）
 st.set_page_config(page_title="新金丸AI資金マネージャー", layout="centered")
 st.title("🎯 新金丸AI × ECP方式 資金マネージャー")
 jst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
 st.caption(f"🕒 日本時間：{jst_now.strftime('%Y/%m/%d %H:%M:%S')}")
 
-# 初期セッション
+# 初期値
 if "balance" not in st.session_state:
     st.session_state.balance = 10000
 if "goal" not in st.session_state:
@@ -20,7 +18,7 @@ if "ecp" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# 残高・目標金額
+# 資金入力
 st.subheader("💼 資金設定")
 col1, col2 = st.columns(2)
 with col1:
@@ -28,7 +26,7 @@ with col1:
 with col2:
     st.session_state.goal = st.number_input("目標金額（円）", value=st.session_state.goal, step=100)
 
-# 勝敗入力とオッズ（1.5以上）
+# 勝敗入力
 st.subheader("🎯 勝敗入力")
 col3, col4 = st.columns(2)
 with col3:
@@ -36,10 +34,9 @@ with col3:
 with col4:
     odds = st.number_input("オッズ（的中時）", min_value=1.5, value=1.5, step=0.1)
 
-# 推奨ベット額
 bet_amount = get_next_bet_amount(st.session_state.ecp["loss_count"])
 
-# AI予想（仮→本実装に後日変更）
+# AI予想（仮）
 st.subheader("🧠 AI予想（的中率 × 勝率重視）")
 ai_predictions = [
     {"競艇場": "多摩川", "レース": 5, "式別": "3連単", "予想": "1-3-4"},
@@ -51,7 +48,7 @@ ai_predictions = [
 for pred in ai_predictions:
     st.markdown(f"- 📍{pred['競艇場']} {pred['レース']}R [{pred['式別']}]: **{pred['予想']}**")
 
-# 結果登録
+# 結果記録
 if st.button("✅ 結果を記録"):
     if race_result == "的中":
         profit = int(bet_amount * (odds - 1))
@@ -76,10 +73,8 @@ if st.button("✅ 結果を記録"):
         })
         st.success("記録しました！")
 
-# 結果表示
+# 成績表示
 df = pd.DataFrame(st.session_state.history)
-
-# 成績計算
 if not df.empty:
     hit_rate = (df["結果"] == "的中").mean()
     win_rate = (df["収支"] > 0).mean()
@@ -87,7 +82,6 @@ if not df.empty:
 else:
     hit_rate = win_rate = recovery_rate = 0
 
-# 表示
 st.markdown(f"""
 - 💼 現在の残高：{st.session_state.balance}円  
 - 🎯 目標金額：{st.session_state.goal}円  
@@ -98,7 +92,6 @@ st.markdown(f"""
 - 🧠 次回推奨ベット額（ECP方式）：{bet_amount}円
 """)
 
-# 履歴表示
 if not df.empty:
     st.dataframe(df[::-1], use_container_width=True)
 
