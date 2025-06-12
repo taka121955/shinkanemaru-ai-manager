@@ -1,24 +1,20 @@
-def reset_ecp_state():
+def reset_ecp():
     return {
-        "losses": 0,
-        "base_bets": [100, 300, 900],
-        "phase_bets": [13000, 26000, 61000]
+        "loss": [],
+        "base": 100
     }
 
-def get_next_bet_amount(state):
-    losses = state["losses"]
-    base = state["base_bets"]
-
-    # 第一波（100 → 300 → 900）
-    if losses < len(base):
-        return base[losses]
-    # 第二波突入（合計13000円の回収目指す）
-    elif losses == 3:
+def get_next_bet_amount(ecp_state):
+    loss_count = len(ecp_state["loss"])
+    if loss_count == 0:
+        return 100
+    elif loss_count == 1:
+        return 300
+    elif loss_count == 2:
+        return 900
+    elif loss_count == 3:
         return 2000
-    elif losses == 4:
-        return 4000
-    elif losses == 5:
-        return 7000
+    elif loss_count == 4:
+        return 6000
     else:
-        # 損切りまたは資金が尽きたら1から
-        return base[0]
+        return ecp_state["base"]  # リセット
