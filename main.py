@@ -1,98 +1,111 @@
 import streamlit as st
 import pandas as pd
-from utils.ecp import get_next_bet_amount, reset_ecp
+import datetime
+import random
+from utils.ecp import get_next_bet_amount
 
-st.set_page_config(page_title="AI予想 × 新金丸法 × 資金マネージャー", layout="wide")
-st.title("🔮AI予想 × 新金丸法 × 資金マネージャー")
+# タイトルと現在時刻（日本時間）
+st.set_page_config(page_title="新金丸AI資金マネージャー", layout="centered")
+st.title("🎯 新金丸AI × ECP方式 資金マネージャー")
+jst_now = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+st.caption(f"🕒 日本時間：{jst_now.strftime('%Y/%m/%d %H:%M:%S')}")
 
-# セッション初期化
-if "bets" not in st.session_state:
-    st.session_state.bets = []
+# 初期セッション
 if "balance" not in st.session_state:
     st.session_state.balance = 10000
 if "goal" not in st.session_state:
     st.session_state.goal = 20000
 if "ecp" not in st.session_state:
-    st.session_state.ecp = reset_ecp()
+    st.session_state.ecp = {"loss_count": 0}
+if "history" not in st.session_state:
+    st.session_state.history = []
 
-# 仮のAI予想（的中率×勝率スコア上位5件）
+# 残高・目標金額
+st.subheader("💼 資金設定")
+col1, col2 = st.columns(2)
+with col1:
+    st.session_state.balance = st.number_input("現在の残高（円）", value=st.session_state.balance, step=100)
+with col2:
+    st.session_state.goal = st.number_input("目標金額（円）", value=st.session_state.goal, step=100)
+
+# 勝敗入力とオッズ（1.5以上）
+st.subheader("🎯 勝敗入力")
+col3, col4 = st.columns(2)
+with col3:
+    race_result = st.radio("レース結果", ["未入力", "的中", "外れ"], index=0)
+with col4:
+    odds = st.number_input("オッズ（的中時）", min_value=1.5, value=1.5, step=0.1)
+
+# 推奨ベット額
+bet_amount = get_next_bet_amount(st.session_state.ecp["loss_count"])
+
+# AI予想（仮→本実装に後日変更）
+st.subheader("🧠 AI予想（的中率 × 勝率重視）")
 ai_predictions = [
-    {"競艇場": "住之江", "レース": "9R", "式別": "3連単", "艇番": "1-2-3", "スコア": 0.86},
-    {"競艇場": "住之江", "レース": "11R", "式別": "2連単", "艇番": "1-3", "スコア": 0.77},
-    {"競艇場": "住之江", "レース": "1R", "式別": "単勝", "艇番": "1", "スコア": 0.70},
-    {"競艇場": "大村", "レース": "4R", "式別": "3連複", "艇番": "2-3-4", "スコア": 0.65},
-    {"競艇場": "唐津", "レース": "5R", "式別": "2連複", "艇番": "1-4", "スコア": 0.63}
+    {"競艇場": "多摩川", "レース": 5, "式別": "3連単", "予想": "1-3-4"},
+    {"競艇場": "児島", "レース": 7, "式別": "3連単", "予想": "2-1-5"},
+    {"競艇場": "丸亀", "レース": 4, "式別": "3連単", "予想": "3-4-1"},
+    {"競艇場": "住之江", "レース": 10, "式別": "3連単", "予想": "4-1-2"},
+    {"競艇場": "若松", "レース": 6, "式別": "3連単", "予想": "5-2-1"},
 ]
-
-st.subheader("📊AI予想（的中率×勝率 スコア上位5レース）")
 for pred in ai_predictions:
-    st.markdown(f"{pred['競艇場']}：{pred['レース']}（{pred['式別']} {pred['艇番']}） スコア：{pred['スコア']}")
+    st.markdown(f"- 📍{pred['競艇場']} {pred['レース']}R [{pred['式別']}]: **{pred['予想']}**")
 
-# ベット記録入力
-st.subheader("🎯ベット記録入力")
-with st.form("bet_form"):
-    col1, col2 = st.columns(2)
-    with col1:
-        place = st.selectbox("競艇場", ["住之江", "大村", "唐津", "戸田", "多摩川"])
-    with col2:
-        race = st.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
+# 結果登録
+if st.button("✅ 結果を記録"):
+    if race_result == "的中":
+        profit = int(bet_amount * (odds - 1))
+        st.session_state.balance += profit
+        st.session_state.ecp["loss_count"] = 0
+        outcome = "的中"
+    elif race_result == "外れ":
+        st.session_state.balance -= bet_amount
+        st.session_state.ecp["loss_count"] += 1
+        outcome = "外れ"
+    else:
+        outcome = "未入力"
 
-    amount = st.number_input("賭け金（円）", min_value=100, step=100)
-    odds = st.number_input("オッズ（1.0以上）", min_value=1.0, step=0.1)
-    result = st.selectbox("結果", ["的中", "不的中"])
-
-    submitted = st.form_submit_button("登録する")
-    if submitted:
-        payout = int(amount * odds) if result == "的中" else -int(amount)
-        st.session_state.bets.append({
-            "競艇場": place,
-            "レース": race,
-            "賭け金": amount,
+    if race_result != "未入力":
+        st.session_state.history.append({
+            "日付": jst_now.strftime("%Y/%m/%d %H:%M:%S"),
+            "結果": outcome,
+            "ベット額": bet_amount,
             "オッズ": odds,
-            "結果": result,
-            "収支": payout
+            "収支": profit if outcome == "的中" else -bet_amount,
+            "残高": st.session_state.balance
         })
-        st.session_state.balance += payout
-        if result == "的中":
-            st.session_state.ecp["loss_count"] = 0
-        else:
-            st.session_state.ecp["loss_count"] += 1
-        st.success("記録が追加されました。")
+        st.success("記録しました！")
 
-# 決算表示
-st.subheader("📋決算表")
-df = pd.DataFrame(st.session_state.bets)
-st.dataframe(df)
+# 結果表示
+df = pd.DataFrame(st.session_state.history)
 
-# 統計情報の計算
+# 成績計算
 if not df.empty:
-    cumulative_profit = int(df["収支"].sum())
-    hit_rate = round((df["結果"] == "的中").sum() / len(df) * 100, 1)
-    win_rate = round((df["収支"] > 0).sum() / len(df) * 100, 1)
-    total_bet = df["賭け金"].sum()
-    total_return = df["収支"].where(df["収支"] > 0, 0).sum()
-    recovery_rate = round(total_return / total_bet * 100, 1) if total_bet > 0 else 0.0
+    hit_rate = (df["結果"] == "的中").mean()
+    win_rate = (df["収支"] > 0).mean()
+    recovery_rate = df["収支"].sum() / df["ベット額"].sum() + 1 if df["ベット額"].sum() > 0 else 0
 else:
-    cumulative_profit = 0
-    hit_rate = 0.0
-    win_rate = 0.0
-    recovery_rate = 0.0
+    hit_rate = win_rate = recovery_rate = 0
 
-next_bet = get_next_bet_amount(st.session_state.ecp.get("loss_count", 0))
+# 表示
+st.markdown(f"""
+- 💼 現在の残高：{st.session_state.balance}円  
+- 🎯 目標金額：{st.session_state.goal}円  
+- 📉 累積損益：{df['収支'].sum() if not df.empty else 0}円  
+- 🎯 的中率：{round(hit_rate * 100, 1)}%  
+- 🏆 勝率：{round(win_rate * 100, 1)}%  
+- 💸 回収率：{round(recovery_rate * 100, 1)}%
+- 🧠 次回推奨ベット額（ECP方式）：{bet_amount}円
+""")
 
-st.markdown("### 📊 統計情報")
-st.markdown(
-    f"現在の残高：{st.session_state.balance}円  \n"
-    f"目標金額：{st.session_state.goal}円  \n"
-    f"累積損益：{cumulative_profit}円  \n"
-    f"的中率：{hit_rate}%  \n"
-    f"勝率：{win_rate}%  \n"
-    f"回収率：{recovery_rate}%  \n"
-    f"次回推奨ベット額（ECP方式）：{next_bet}円"
-)
+# 履歴表示
+if not df.empty:
+    st.dataframe(df[::-1], use_container_width=True)
 
-if st.button("🔁 1からスタート"):
-    st.session_state.bets = []
+# リセット
+if st.button("🔄 1からスタート（記録リセット）"):
     st.session_state.balance = 10000
-    st.session_state.ecp = reset_ecp()
-    st.experimental_rerun()
+    st.session_state.goal = 20000
+    st.session_state.ecp = {"loss_count": 0}
+    st.session_state.history = []
+    st.success("リセットしました。")
