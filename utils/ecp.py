@@ -1,17 +1,14 @@
-def calculate_next_bet(records, balance):
+def get_next_bet_amount(records):
     """
-    ECP方式：第一波（1000円 → 3000円 → 9000円）の資金戦略でベット額を提案
+    新金丸法 × ECP方式：1:3:9の3段階で資金配分
+    総資金は10,000円想定。3段階目は最大で9,000円まで。
     """
-
-    # 分割資金
-    base_unit = 10000  # 仮に元資金が10000円前提
-    wave1 = [100, 300, 900]  # 第一波の配分（例：1300円 → 100:300:900）
-
     losses = [r for r in records if r["結果"] == "不的中"]
-    loss_count = len(losses) % 3
+    count = len(losses)
 
-    # 波数に応じてベット額変化（最大3連敗まで）
-    try:
-        return wave1[loss_count]
-    except IndexError:
-        return 100  # リセット（またはエラー対策）
+    if count % 3 == 0:
+        return 100  # 1回目
+    elif count % 3 == 1:
+        return 300  # 2回目
+    else:
+        return 900  # 3回目
