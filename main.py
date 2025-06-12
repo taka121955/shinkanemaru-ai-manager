@@ -32,7 +32,7 @@ def generate_predictions():
         predictions.append(prediction)
     return predictions
 
-st.markdown("## 🧠 AI予想（的中率・勝率重視 上位5件）")
+st.markdown("## 🧠 AI予想（的中率 × 勝率重視 上位5件）")
 for pred in generate_predictions():
     st.markdown(
         f"- 競艇場：{pred['競艇場']}｜レース：{pred['レース']}｜式別：{pred['式別']}｜艇番：{pred['艇番']}｜オッズ：{pred['オッズ']}倍"
@@ -49,14 +49,16 @@ recovery_rate = (df["収支"].sum() / df["賭金"].sum()) * 100 if df.shape[0] >
 st.markdown("## 📊 統計データ")
 st.markdown(f"""
 - 💼 現在の残高：{st.session_state.balance}円  
-- 📉 累積収支：{df['収支'].sum()}円  
+- 🎯 目標金額：20000円  
+- 📉 累積損益：{df['収支'].sum()}円  
 - 🎯 的中率：{hit_rate:.1f}%  
 - 🏆 勝率：{win_rate:.1f}%  
-- 💸 回収率：{recovery_rate:.1f}%
+- 💸 回収率：{recovery_rate:.1f}%  
+- 🧠 次回推奨賭金（ECP方式）：100円
 """)
 
 # 勝敗入力フォーム
-st.markdown("## 🎲 勝敗入力")
+st.markdown("## 🎮 勝敗入力")
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -84,7 +86,7 @@ if submit:
     }])
     st.session_state.df = pd.concat([st.session_state.df, new_row], ignore_index=True)
     st.session_state.balance += profit
-    st.experimental_rerun()
+    st.rerun()  # ← 修正された部分
 
 # 勝敗履歴表示
 st.markdown("## 📘 勝敗履歴")
