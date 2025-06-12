@@ -1,105 +1,84 @@
-import streamlit as st
-import pandas as pd
 from datetime import datetime
-from utils.ecp import get_next_bet_amount
-from utils.ai_predictor import get_ai_predictions
+import pandas as pd
+import streamlit as st
 
-st.set_page_config(page_title="新金丸法 × AI予想マネージャー", layout="wide")
+# --- ダミーのAI予想関数 ---
+def get_ai_predictions():
+    return [
+        {"場": "住之江", "レース": "9", "式別": "3連単", "買い目": "1-2-3", "score": 0.86},
+        {"場": "住之江", "レース": "11", "式別": "3連単", "買い目": "2-1-3", "score": 0.77},
+        {"場": "住之江", "レース": "1", "式別": "3連単", "買い目": "1-3-2", "score": 0.70},
+        {"場": "大村", "レース": "5", "式別": "3連単", "買い目": "3-1-2", "score": 0.68},
+        {"場": "丸亀", "レース": "7", "式別": "3連単", "買い目": "1-2-6", "score": 0.66},
+    ]
 
-# セッション初期化
-if "balance" not in st.session_state:
-    st.session_state.balance = 10000
-if "goal" not in st.session_state:
-    st.session_state.goal = 20000
-if "ecp" not in st.session_state:
-    st.session_state.ecp = {"loss_count": 0}
+# --- 初期設定 ---
+st.set_page_config(page_title="AI予想×新金丸法", layout="wide")
+
+# --- 日本時間表示 ---
+st.markdown("### 🕒 現在の日本時間")
+st.markdown(f"<h2><b>{datetime.now().strftime('%Y/%m/%d %H:%M:%S')}</b></h2>", unsafe_allow_html=True)
+
+# --- AI予想表示 ---
+st.markdown("## 🧠 AI予想（中率 × 勝率重視）")
+for pred in get_ai_predictions():
+    st.markdown(f"🏁 {pred['場']} 🎯{pred['レース']}R 🧠 {pred['式別']}【{pred['買い目']}】 スコア：{pred['score']}")
+
+# --- セッション初期化 ---
 if "records" not in st.session_state:
     st.session_state.records = []
 
-# 📅 日本時間表示
-now_japan = datetime.utcnow().astimezone().strftime("%Y年%m月%d日 %H:%M:%S")
-st.markdown(f"<h2 style='font-size:28px; font-weight:bold;'>🕒 日本時間：{now_japan}</h2>", unsafe_allow_html=True)
-
-# 🧠 AI予想
-st.subheader("🧠AI予想（的中率 × 勝率重視）")
-ai_preds = get_ai_predictions()
-for pred in ai_preds:
-    try:
-        st.markdown(f"🏟️ {pred['場']} 🎯{pred['レース']}R 💡{pred['式別']} 🎯{pred['買い目']} 💡スコア：{pred['score']}")
-    except KeyError:
-        pass
-
-# 📊 統計情報
 df = pd.DataFrame(st.session_state.records)
-if not df.empty:
-    df["収支"] = df.apply(
-        lambda row: row["賭金"] * row["オッズ"] if row["結果"] == "的中" else -row["賭金"], axis=1
-    )
 
-hit_count = len(df[df["結果"] == "的中"]) if not df.empty else 0
-win_count = hit_count
-total_count = len(df) if not df.empty else 0
-
-hit_rate = hit_count / total_count if total_count else 0
-win_rate = win_count / total_count if total_count else 0
-recovery_rate = df["収支"].sum() / df["賭金"].sum() if not df.empty and df["賭金"].sum() != 0 else 0
-
-next_bet = 100 if df["収支"].sum() >= 0 else get_next_bet_amount(st.session_state.ecp["loss_count"])
+# --- 統計情報 ---
+st.markdown("## 📊 統計情報")
+hit_count = df[df["結果"] == "的中"].shape[0] if not df.empty else 0
+total_count = df.shape[0]
+win_rate = hit_count / total_count if total_count > 0 else 0
+recovery_rate = (
+    df["収支"].sum() / df["賭金"].sum()
+    if not df.empty and df["賭金"].sum() > 0 else 0
+)
+current_balance = 10000 + (df["収支"].sum() if not df.empty else 0)
 
 st.markdown(f"""
-### 📈統計情報
-- 💼現在の残高：{st.session_state.balance}円
-- 🎯目標金額：{st.session_state.goal}円
-- 📉累積損益：{df["収支"].sum() if not df.empty else 0}円
-- 🎯的中率：{round(hit_rate*100, 1)}%
-- 🏆勝率：{round(win_rate*100, 1)}%
-- 💸回収率：{round(recovery_rate*100, 1)}%
-- 🧠次回推奨ベット額（ECP方式）：{next_bet}円
+- 💼 現在の残高：{current_balance}円  
+- 🎯 的中率：{round(win_rate * 100, 1)}%  
+- 💸 回収率：{round(recovery_rate * 100, 1)}%  
+- 🧠 次回推奨ベット額（ECP方式）：100円
 """)
 
-# 📝 勝敗入力
-st.subheader("✏️ 勝敗入力")
+# --- 勝敗入力フォーム ---
+st.markdown("## ✏️ 勝敗入力")
 col1, col2, col3, col4, col5 = st.columns(5)
-place = col1.selectbox("競艇場", ["住之江", "丸亀", "芦屋", "若松", "蒲郡", "大村", "平和島"])
-race_number = col2.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
-odds = col3.number_input("オッズ（1.5以上）", min_value=1.5, step=0.1)
-amount = col4.number_input("賭金", min_value=100, step=100)
-result = col5.radio("的中／不的中", ["的中", "不的中"])
-if st.button("記録"):
-    st.session_state.records.append({
-        "日付": now_japan,
-        "競艇場": place,
-        "レース": race_number,
-        "オッズ": odds,
-        "賭金": amount,
-        "結果": result
-    })
-    if result == "不的中":
-        st.session_state.balance -= amount
-        st.session_state.ecp["loss_count"] += 1
-    else:
-        st.session_state.balance += amount * odds
-        st.session_state.ecp["loss_count"] = 0
-    st.rerun()
+場 = col1.selectbox("競艇場", ["住之江", "大村", "丸亀", "芦屋", "若松"])
+レース = col2.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
+オッズ = col3.number_input("オッズ（1.5以上）", min_value=1.5, step=0.1)
+賭金 = col4.number_input("賭金", min_value=100, step=100)
+結果 = col5.radio("的中／不的中", ["的中", "不的中"])
 
-# 📋 勝敗履歴
-st.subheader("📊 勝敗履歴")
+# --- 記録保存処理 ---
+if st.button("記録"):
+    収支 = int(賭金 * オッズ) - 賭金 if 結果 == "的中" else -賭金
+    st.session_state.records.append({
+        "日付": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "競艇場": 場,
+        "レース": レース,
+        "オッズ": オッズ,
+        "賭金": 賭金,
+        "結果": 結果,
+        "収支": 収支
+    })
+    st.success("✅ 記録を保存しました。")
+    st.experimental_rerun()
+
+# --- 勝敗履歴表示 ---
+st.markdown("## 📉 勝敗履歴")
 if not df.empty:
-    df["収支"] = df.apply(
-        lambda row: row["賭金"] * row["オッズ"] if row["結果"] == "的中" else -row["賭金"],
-        axis=1
-    )
     st.dataframe(df)
 else:
-    st.info("記録がまだありません。")
+    st.info("履歴がまだありません。")
 
-# 🧹 リセット機能
-if st.button("1からスタート"):
-    st.session_state.records = []
-    st.session_state.balance = 10000
-    st.session_state.ecp["loss_count"] = 0
-    st.rerun()
-
-# 👤 制作者表記
+# --- フッター ---
 st.markdown("---")
-st.markdown("制作：**小島崇彦**")
+st.markdown("制作者：小島崇彦")
