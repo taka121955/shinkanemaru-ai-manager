@@ -1,14 +1,15 @@
-def get_next_bet_amount(records):
-    """
-    新金丸法 × ECP方式：1:3:9の3段階で資金配分
-    総資金は10,000円想定。3段階目は最大で9,000円まで。
-    """
-    losses = [r for r in records if r["結果"] == "不的中"]
-    count = len(losses)
+def reset_ecp():
+    return {
+        "loss_count": 0,
+        "base_bet": 100,
+    }
 
-    if count % 3 == 0:
-        return 100  # 1回目
-    elif count % 3 == 1:
-        return 300  # 2回目
+def get_next_bet_amount(loss_count):
+    if loss_count == 0:
+        return 100
+    elif loss_count == 1:
+        return 300
+    elif loss_count == 2:
+        return 900
     else:
-        return 900  # 3回目
+        return 100
