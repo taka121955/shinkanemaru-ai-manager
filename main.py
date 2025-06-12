@@ -1,4 +1,13 @@
-import streamlit as st
+def ai_predict_next_bet(records):
+    if not records:
+        return {"競艇場": "住之江", "レース": "1R", "理由": "初戦"}
+    
+    # 勝率や回収率などを分析して予想（仮定）
+    latest = records[-1]
+    if latest["結果"] == "不的中":
+        return {"競艇場": "大村", "レース": "3R", "理由": "前回負けたためナイター切替"}
+    else:
+        return {"競艇場": "住之江", "レース": "4R", "理由": "継続"}import streamlit as st
 import pandas as pd
 from utils.ecp import get_next_bet_amount, reset_ecp_state
 
