@@ -1,19 +1,19 @@
-def get_next_bet_amount(loss_count):
-    """
-    ECP方式による次回賭け金の決定。
-    """
-    base_bets = [100, 300, 900]
-    if loss_count < len(base_bets):
-        return base_bets[loss_count]
-    return 1300 * (2 ** (loss_count - 2))  # 2倍で増える想定
+def calculate_next_bet(df):
+    if df.empty:
+        return 100  # 初回は100円
 
+    last_bet = df["賭金"].iloc[-1]
+    last_result = df["的中"].iloc[-1]
 
-def update_ecp(result):
-    """
-    勝敗に応じたECPカウント更新。
-    """
-    import streamlit as st
-    if result == "的中":
-        st.session_state.ecp["loss_count"] = 0
+    if last_result == "的中":
+        return 100
     else:
-        st.session_state.ecp["loss_count"] += 1
+        # ECP方式: 損失を回収するための3ステップ（100円→300円→900円）
+        losses = df[df["的中"] == "不的中"]
+        loss_count = len(losses)
+        if loss_count == 1:
+            return 300
+        elif loss_count == 2:
+            return 900
+        else:
+            return 100  # リセット
