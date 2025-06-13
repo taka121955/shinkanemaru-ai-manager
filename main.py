@@ -2,17 +2,25 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ページ構成の選択肢
-pages = {
-    "🧠 AI予想": "ai_prediction",
-    "🏠 メイン": "main",
-    "✍️ 勝敗入力": "result_input"
-}
+# ページ状態をセッションに保存
+if 'page' not in st.session_state:
+    st.session_state.page = 'main'
 
-# サイドバーのメニュー
-selection = st.sidebar.radio("ページを選択してください", list(pages.keys()))
+# ページ切り替え用ボタン
+col1, col2, col3 = st.columns(3)
+with col1:
+    if st.button("🏠 メイン"):
+        st.session_state.page = 'main'
+with col2:
+    if st.button("🧠 AI予想"):
+        st.session_state.page = 'ai'
+with col3:
+    if st.button("✍️ 勝敗入力"):
+        st.session_state.page = 'result'
 
-# ページごとの処理
+st.markdown("---")
+
+# ページ表示関数
 def show_main_page():
     st.title("🏠 メインページ")
     now = datetime.now(pytz.timezone("Asia/Tokyo")).strftime("%Y-%m-%d %H:%M:%S")
@@ -23,18 +31,18 @@ def show_main_page():
     st.markdown("---")
     st.markdown("#### 👤 制作者：小島崇彦")
 
-def show_ai_prediction():
-    st.title("🧠 AI予想")
-    st.markdown("※ここにAIによる予想を表示します（開発中）")
+def show_ai_prediction_page():
+    st.title("🧠 AI予想ページ")
+    st.markdown("※ ここにAIによる予想結果が表示されます（開発中）")
 
-def show_result_input():
-    st.title("✍️ 勝敗入力")
-    st.markdown("※ここに勝敗結果の入力フォームを設置します（開発中）")
+def show_result_input_page():
+    st.title("✍️ 勝敗入力ページ")
+    st.markdown("※ ここに勝敗入力フォームを配置予定（開発中）")
 
-# 選択されたページの表示
-if pages[selection] == "main":
+# ページ表示
+if st.session_state.page == 'main':
     show_main_page()
-elif pages[selection] == "ai_prediction":
-    show_ai_prediction()
-elif pages[selection] == "result_input":
-    show_result_input()
+elif st.session_state.page == 'ai':
+    show_ai_prediction_page()
+elif st.session_state.page == 'result':
+    show_result_input_page()
