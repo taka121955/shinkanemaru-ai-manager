@@ -2,53 +2,71 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ページ設定
-st.set_page_config(page_title="競艇AI資金管理", layout="centered")
+# 日本時間取得
+japan_time = datetime.now(pytz.timezone("Asia/Tokyo")).strftime("%Y/%m/%d %H:%M:%S")
 
-# --- ヘッダー部分（共通） ---
-st.markdown("## 🕒 現在時刻（日本時間）")
-jst_time = datetime.now(pytz.timezone('Asia/Tokyo'))
-st.markdown(f"<h1 style='text-align: center; font-size: 36px;'>{jst_time.strftime('%Y/%m/%d %H:%M:%S')}</h1>", unsafe_allow_html=True)
+# 初期設定
+initial_funds = 10000
+target_funds = 10000
+cumulative_profit = 5000
 
-st.markdown("---")
-st.markdown("### 🎯 目標金額：10000円")
-st.markdown("### 💰 初期資金：10000円")
+# ページ切替用のセッション状態
+if "page" not in st.session_state:
+    st.session_state.page = "main"
 
-# 累積費用の仮表示（自動反映に後で対応）
-cumulative_cost = 5000
-st.markdown(f"### 📊 累積費用：{cumulative_cost}円")
+# ページ切り替え関数
+def switch_page(name):
+    st.session_state.page = name
 
-# --- ページ切替ボタン（中央整列） ---
-st.markdown("---")
-col1, col2, col3, col4, col5 = st.columns(5)
-page = None
-if col1.button("① AI予想"):
-    page = "ai"
-elif col2.button("② 勝敗入力"):
-    page = "input"
-elif col3.button("③ 統計データ"):
-    page = "stats"
-elif col4.button("④ 勝敗履歴"):
-    page = "history"
-elif col5.button("⑤ 競艇結果"):
-    page = "result"
+# ---------- メインページ ----------
+if st.session_state.page == "main":
+    st.markdown(f"### 🕓 現在時刻（日本時間）\n#### {japan_time}")
+    st.markdown(f"### 🎯 目標金額：{target_funds}円")
+    st.markdown(f"### 💰 初期資金：{initial_funds}円")
+    st.markdown(f"### 📊 累積金額：{cumulative_profit}円")
 
-st.markdown("---")
+    st.markdown("---")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        if st.button("①AI予想"):
+            switch_page("ai")
+    with col2:
+        if st.button("②勝敗入力"):
+            switch_page("input")
+    with col3:
+        if st.button("③統計データ"):
+            switch_page("stats")
+    with col4:
+        if st.button("④勝敗履歴"):
+            switch_page("history")
+    with col5:
+        if st.button("⑤競艇結果"):
+            switch_page("results")
+    st.markdown("---")
+    st.markdown("👤 **制作者：小島崇彦**")
 
-# --- 各ページ表示内容 ---
-if page == "ai":
+# ---------- 各ページ ----------
+elif st.session_state.page == "ai":
     st.markdown("## 🧠 AI予想ページ（ここにAI予想の内容を表示）")
-elif page == "input":
-    st.markdown("## ✍️ 勝敗入力ページ（ここに勝敗入力フォーム）")
-elif page == "stats":
-    st.markdown("## 📈 統計データページ（勝率・回収率など）")
-elif page == "history":
-    st.markdown("## 📜 勝敗履歴ページ（履歴の一覧）")
-elif page == "result":
-    st.markdown("## 🏁 競艇結果ページ（各レースの結果など）")
-else:
-    st.markdown("### ページを選択してください。")
+    if st.button("← メインへ戻る"):
+        switch_page("main")
 
-# --- フッター ---
-st.markdown("---")
-st.markdown("#### 👤 制作者：小島崇彦")
+elif st.session_state.page == "input":
+    st.markdown("## ✍️ 勝敗入力ページ（ここに入力フォームを表示）")
+    if st.button("← メインへ戻る"):
+        switch_page("main")
+
+elif st.session_state.page == "stats":
+    st.markdown("## 📈 統計データページ（ここに統計情報を表示）")
+    if st.button("← メインへ戻る"):
+        switch_page("main")
+
+elif st.session_state.page == "history":
+    st.markdown("## 📖 勝敗履歴ページ（ここに履歴を表示）")
+    if st.button("← メインへ戻る"):
+        switch_page("main")
+
+elif st.session_state.page == "results":
+    st.markdown("## 🏁 競艇結果ページ（ここに各レースの結果を表示）")
+    if st.button("← メインへ戻る"):
+        switch_page("main")
