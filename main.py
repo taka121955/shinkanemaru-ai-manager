@@ -2,46 +2,39 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# 日本時間の表示（太字・大きめ）
-japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
-st.markdown(f"## 🕒 日本時間：**{japan_time.strftime('%Y年%m月%d日（%a）%H:%M')}**")
+# ページ構成の選択肢
+pages = {
+    "🧠 AI予想": "ai_prediction",
+    "🏠 メイン": "main",
+    "✍️ 勝敗入力": "result_input"
+}
 
-# 初期資金と目標金額の表示（中央揃え）
-st.markdown("### 💰 初期資金：**10,000円**　｜　🎯 目標金額：**10,000円**")
+# サイドバーのメニュー
+selection = st.sidebar.radio("ページを選択してください", list(pages.keys()))
 
-st.markdown("---")
+# ページごとの処理
+def show_main_page():
+    st.title("🏠 メインページ")
+    now = datetime.now(pytz.timezone("Asia/Tokyo")).strftime("%Y-%m-%d %H:%M:%S")
+    st.markdown(f"### 🕒 現在時刻：**{now}**")
+    st.markdown("### 🎯 目標金額：**¥10,000**")
+    st.markdown("### 💰 初期費用：**¥10,000**")
+    st.markdown("### 📊 累積費用：**（自動反映）**")
+    st.markdown("---")
+    st.markdown("#### 👤 制作者：小島崇彦")
 
-# ページ構成
-page = st.sidebar.selectbox("表示するページを選んでください", [
-    "① AI予想（今日の出走表）",
-    "② 結果記録ページ",
-    "③ 統計データページ",
-    "④ 勝敗入力ページ",
-    "⑤ 競艇結果取込"
-])
+def show_ai_prediction():
+    st.title("🧠 AI予想")
+    st.markdown("※ここにAIによる予想を表示します（開発中）")
 
-if page == "① AI予想（今日の出走表）":
-    st.header("① AI予想：出走表付き")
-    st.info("⚙️ 本物のAI予想機能は現在準備中です。仮ではなく実装予定。")
-    # AI予想ロジック（式別・艇番・的中率でソート予定）
+def show_result_input():
+    st.title("✍️ 勝敗入力")
+    st.markdown("※ここに勝敗結果の入力フォームを設置します（開発中）")
 
-elif page == "② 結果記録ページ":
-    st.header("② 結果記録")
-    st.warning("⚠️ 機能準備中：レース結果の保存・履歴表示機能がここに実装されます。")
-
-elif page == "③ 統計データページ":
-    st.header("③ 統計データ")
-    st.success("✅ 勝率、的中率、回収率などの統計表示準備中。")
-    # 次回賭金や回収率表示はここに
-
-elif page == "④ 勝敗入力ページ":
-    st.header("④ 勝敗入力")
-    st.write("レース結果を記録してください。")
-    # 入力フォーム（競艇場名、レース番号、賭金、オッズ、結果）
-
-elif page == "⑤ 競艇結果取込":
-    st.header("⑤ 競艇結果自動入力")
-    st.info("⚙️ 自動で公式サイトなどからレース結果を取得する機能（開発中）")
-
-st.markdown("---")
-st.markdown("#### 👤 制作者：小島崇彦")
+# 選択されたページの表示
+if pages[selection] == "main":
+    show_main_page()
+elif pages[selection] == "ai_prediction":
+    show_ai_prediction()
+elif pages[selection] == "result_input":
+    show_result_input()
