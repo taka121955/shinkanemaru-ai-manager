@@ -2,20 +2,14 @@ import streamlit as st
 import pandas as pd
 import os
 
-# ファイルパス
-RESULTS_FILE = "results.csv"
+def show():
+    st.header("📖 勝敗履歴")
 
-st.title("④ 結果履歴")
+    csv_file = "shinkanemaru_ai_manager/results.csv"
 
-# 結果ファイルが存在するか確認
-if os.path.exists(RESULTS_FILE):
-    df = pd.read_csv(RESULTS_FILE)
-    if df.empty:
-        st.info("まだ結果が入力されていません。")
-    else:
+    if os.path.exists(csv_file):
+        df = pd.read_csv(csv_file)
         st.dataframe(df)
-        # CSVダウンロードボタン
-        csv = df.to_csv(index=False).encode("utf-8-sig")
-        st.download_button("CSVをダウンロード", csv, "結果履歴.csv", "text/csv")
-else:
-    st.warning("結果ファイルが存在しません。")
+        st.download_button("📥 CSVダウンロード", df.to_csv(index=False), "results.csv", "text/csv")
+    else:
+        st.info("まだ勝敗履歴がありません。")
