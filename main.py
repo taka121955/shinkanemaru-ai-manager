@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
+import os
 from utils.calc_ecp import calculate_next_bet
 
 st.title("📊 統計データ")
 
-# 勝敗履歴ファイルの読み込み or 初期化
 csv_file = "history.csv"
 if os.path.exists(csv_file):
     df = pd.read_csv(csv_file)
@@ -47,4 +47,3 @@ if st.button("記録する"):
     df.loc[len(df)] = [場, レース, オッズ, 賭金, 的中, 払戻, 収支]
     df.to_csv(csv_file, index=False)
     st.success("✅ 記録しました！")
-    
