@@ -1,72 +1,69 @@
-import streamlit as st
 from datetime import datetime
-import pandas as pd
+import streamlit as st
 import pytz
 import os
+import pandas as pd
 
-# CSVファイル
-csv_file = "results.csv"
+# ページ設定
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ページ状態
-if "page" not in st.session_state:
-    st.session_state.page = "main"
+# 日本時間の現在時刻
+jst = pytz.timezone("Asia/Tokyo")
+now = datetime.now(jst).strftime("%Y-%m-%d %H:%M:%S")
 
-# ⏰ 日本時間で現在時刻を表示
-japan = pytz.timezone("Asia/Tokyo")
-now = datetime.now(japan)
-st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）</h3>", unsafe_allow_html=True)
-st.markdown(f"<h1 style='text-align: center;'>{now.strftime('%Y/%m/%d %H:%M:%S')}</h1>", unsafe_allow_html=True)
+# CSVの初期化と読み込み
+csv_path = "results.csv"
+if not os.path.exists(csv_path):
+    df = pd.DataFrame(columns=["日付", "競艇場", "レース", "式別", "賭け金", "的中", "払戻金"])
+    df.to_csv(csv_path, index=False)
 
-# 💰 初期資金・累積金額の表示
-initial_amount = 10000
-target_amount = 10000
-accumulated_amount = 0
+# データの読み込み
+df = pd.read_csv(csv_path)
 
-if os.path.exists(csv_file):
-    df = pd.read_csv(csv_file)
-    if "収支" in df.columns:
-        accumulated_amount = df["収支"].sum()
-
-st.markdown(f"🎯 目標金額：{target_amount}円")
-st.markdown(f"💰 初期資金：{initial_amount}円")
-st.markdown(f"📊 累積資金額：{accumulated_amount}円")
-
-# 🔘 ページ切替ボタン（中央揃え2列）
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
-    if st.button("①AI予想"):
-        st.session_state.page = "ai"
-with col3:
-    if st.button("②勝敗入力"):
-        st.session_state.page = "input"
-
-col4, col5, col6 = st.columns([1, 1, 1])
-with col4:
-    if st.button("③統計データ"):
-        st.session_state.page = "stats"
-with col6:
-    if st.button("④結果履歴"):
-        st.session_state.page = "history"
-
-col7, col8, col9 = st.columns([1, 1, 1])
-with col5:
-    if st.button("⑤競艇結果"):
-        st.session_state.page = "results"
-
-# ページ表示内容
-if st.session_state.page == "ai":
-    st.markdown("🧠 **AI予想ページ（ここにAI予想を表示）**")
-elif st.session_state.page == "input":
-    st.markdown("🎮 **勝敗入力ページ（記録用）**")
-elif st.session_state.page == "stats":
-    st.markdown("📊 **統計データページ（勝率・回収率など）**")
-elif st.session_state.page == "history":
-    st.markdown("📖 **結果履歴ページ（一覧表など）**")
-elif st.session_state.page == "results":
-    st.markdown("🏁 **競艇結果ページ（外部リンク・情報）**")
+# 累積資金計算
+if not df.empty:
+    df["損益"] = df["払戻金"] - df["賭け金"]
+    cumulative = df["損益"].sum()
 else:
-    st.markdown("🟢 **メインページです**")
+    cumulative = 0
 
-# 制作者名
+# ---- 上部表示 ----
+st.markdown(f"<h2 style='text-align:center;'>{now}</h2>", unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("🎯 目標金額", "10000円")
+with col2:
+    st.metric("💰 初期資金", "10000円")
+with col3:
+    st.metric("📊 累積資金", f"{cumulative}円")
+
 st.markdown("---")
-st.markdown("👤 制作者：小島崇彦")
+
+# ---- ページ切替ボタン配置 ----
+col_top = st.columns(3)
+col_mid = st.columns(2)
+col_bot = st.columns(2)
+
+with col_top[1]:
+    if st.button("① AI予想"):
+        st.switch_page("pages/page1_ai_prediction.py")
+
+with col_mid[0]:
+    if st.button("② 勝敗入力"):
+        st.switch_page("pages/page2_input_result.py")
+
+with col_mid[1]:
+    if st.button("③ 統計データ"):
+        st.switch_page("pages/page3_statistics.py")
+
+with col_bot[0]:
+    if st.button("④ 結果履歴"):
+        st.switch_page("pages/page4_record_result.py")
+
+with col_bot[1]:
+    if st.button("⑤ 競艇結果"):
+        st.switch_page("pages/page5_boat_results.py")
+
+st.markdown("---")
+st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
