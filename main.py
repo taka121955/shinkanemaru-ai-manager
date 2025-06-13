@@ -2,47 +2,53 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ページ状態をセッションに保存
-if 'page' not in st.session_state:
-    st.session_state.page = 'main'
+# ページ設定
+st.set_page_config(page_title="競艇AI資金管理", layout="centered")
 
-# ページ切り替え用ボタン
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("🏠 メイン"):
-        st.session_state.page = 'main'
-with col2:
-    if st.button("🧠 AI予想"):
-        st.session_state.page = 'ai'
-with col3:
-    if st.button("✍️ 勝敗入力"):
-        st.session_state.page = 'result'
+# --- ヘッダー部分（共通） ---
+st.markdown("## 🕒 現在時刻（日本時間）")
+jst_time = datetime.now(pytz.timezone('Asia/Tokyo'))
+st.markdown(f"<h1 style='text-align: center; font-size: 36px;'>{jst_time.strftime('%Y/%m/%d %H:%M:%S')}</h1>", unsafe_allow_html=True)
+
+st.markdown("---")
+st.markdown("### 🎯 目標金額：10000円")
+st.markdown("### 💰 初期資金：10000円")
+
+# 累積費用の仮表示（自動反映に後で対応）
+cumulative_cost = 5000
+st.markdown(f"### 📊 累積費用：{cumulative_cost}円")
+
+# --- ページ切替ボタン（中央整列） ---
+st.markdown("---")
+col1, col2, col3, col4, col5 = st.columns(5)
+page = None
+if col1.button("① AI予想"):
+    page = "ai"
+elif col2.button("② 勝敗入力"):
+    page = "input"
+elif col3.button("③ 統計データ"):
+    page = "stats"
+elif col4.button("④ 勝敗履歴"):
+    page = "history"
+elif col5.button("⑤ 競艇結果"):
+    page = "result"
 
 st.markdown("---")
 
-# ページ表示関数
-def show_main_page():
-    st.title("🏠 メインページ")
-    now = datetime.now(pytz.timezone("Asia/Tokyo")).strftime("%Y-%m-%d %H:%M:%S")
-    st.markdown(f"### 🕒 現在時刻：**{now}**")
-    st.markdown("### 🎯 目標金額：**¥10,000**")
-    st.markdown("### 💰 初期費用：**¥10,000**")
-    st.markdown("### 📊 累積費用：**（自動反映）**")
-    st.markdown("---")
-    st.markdown("#### 👤 制作者：小島崇彦")
+# --- 各ページ表示内容 ---
+if page == "ai":
+    st.markdown("## 🧠 AI予想ページ（ここにAI予想の内容を表示）")
+elif page == "input":
+    st.markdown("## ✍️ 勝敗入力ページ（ここに勝敗入力フォーム）")
+elif page == "stats":
+    st.markdown("## 📈 統計データページ（勝率・回収率など）")
+elif page == "history":
+    st.markdown("## 📜 勝敗履歴ページ（履歴の一覧）")
+elif page == "result":
+    st.markdown("## 🏁 競艇結果ページ（各レースの結果など）")
+else:
+    st.markdown("### ページを選択してください。")
 
-def show_ai_prediction_page():
-    st.title("🧠 AI予想ページ")
-    st.markdown("※ ここにAIによる予想結果が表示されます（開発中）")
-
-def show_result_input_page():
-    st.title("✍️ 勝敗入力ページ")
-    st.markdown("※ ここに勝敗入力フォームを配置予定（開発中）")
-
-# ページ表示
-if st.session_state.page == 'main':
-    show_main_page()
-elif st.session_state.page == 'ai':
-    show_ai_prediction_page()
-elif st.session_state.page == 'result':
-    show_result_input_page()
+# --- フッター ---
+st.markdown("---")
+st.markdown("#### 👤 制作者：小島崇彦")
