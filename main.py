@@ -1,49 +1,47 @@
 import streamlit as st
-import pandas as pd
-import os
-from utils.calc_ecp import calculate_next_bet
+from datetime import datetime
+import pytz
 
-st.title("📊 統計データ")
+# 日本時間の表示（太字・大きめ）
+japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
+st.markdown(f"## 🕒 日本時間：**{japan_time.strftime('%Y年%m月%d日（%a）%H:%M')}**")
 
-csv_file = "history.csv"
-if os.path.exists(csv_file):
-    df = pd.read_csv(csv_file)
-else:
-    df = pd.DataFrame(columns=["場", "レース", "オッズ", "賭金", "的中", "払戻", "収支"])
-    df.to_csv(csv_file, index=False)
+# 初期資金と目標金額の表示（中央揃え）
+st.markdown("### 💰 初期資金：**10,000円**　｜　🎯 目標金額：**10,000円**")
 
-# 統計計算
-total_bet = df["賭金"].sum() if not df.empty else 0
-total_return = df["払戻"].sum() if not df.empty else 0
-total_profit = df["収支"].sum() if not df.empty else 0
-win_count = df[df["的中"] == "的中"].shape[0]
-total_count = df.shape[0]
+st.markdown("---")
 
-win_rate = win_count / total_count * 100 if total_count > 0 else 0
-hit_rate = win_rate
-roi = (total_return / total_bet) * 100 if total_bet > 0 else 0
-next_bet = calculate_next_bet(df)
+# ページ構成
+page = st.sidebar.selectbox("表示するページを選んでください", [
+    "① AI予想（今日の出走表）",
+    "② 結果記録ページ",
+    "③ 統計データページ",
+    "④ 勝敗入力ページ",
+    "⑤ 競艇結果取込"
+])
 
-# 表示
-st.markdown(f"💼 現在の残高：{10000 + total_profit}円")
-st.markdown(f"🎯 目標金額：20000円")
-st.markdown(f"📈 累積損益：{total_profit}円")
-st.markdown(f"🎯 的中率：{hit_rate:.1f}%")
-st.markdown(f"🏆 勝率：{win_rate:.1f}%")
-st.markdown(f"💸 回収率：{roi:.1f}%")
-st.markdown(f"🧠 次回推奨 賭金（ECP方式）：{next_bet}円")
+if page == "① AI予想（今日の出走表）":
+    st.header("① AI予想：出走表付き")
+    st.info("⚙️ 本物のAI予想機能は現在準備中です。仮ではなく実装予定。")
+    # AI予想ロジック（式別・艇番・的中率でソート予定）
 
-# 入力フォーム
-st.subheader("✏️ 勝敗入力")
-場 = st.selectbox("競艇場", ["大村", "住之江", "平和島", "蒲郡", "丸亀"])
-レース = st.text_input("レース番号", "1R")
-オッズ = st.number_input("オッズ", min_value=1.5, step=0.1)
-賭金 = st.number_input("賭金", min_value=100, step=100)
-的中 = st.radio("結果", ["的中", "不的中"])
+elif page == "② 結果記録ページ":
+    st.header("② 結果記録")
+    st.warning("⚠️ 機能準備中：レース結果の保存・履歴表示機能がここに実装されます。")
 
-if st.button("記録する"):
-    払戻 = int(賭金 * オッズ) if 的中 == "的中" else 0
-    収支 = 払戻 - 賭金
-    df.loc[len(df)] = [場, レース, オッズ, 賭金, 的中, 払戻, 収支]
-    df.to_csv(csv_file, index=False)
-    st.success("✅ 記録しました！")
+elif page == "③ 統計データページ":
+    st.header("③ 統計データ")
+    st.success("✅ 勝率、的中率、回収率などの統計表示準備中。")
+    # 次回賭金や回収率表示はここに
+
+elif page == "④ 勝敗入力ページ":
+    st.header("④ 勝敗入力")
+    st.write("レース結果を記録してください。")
+    # 入力フォーム（競艇場名、レース番号、賭金、オッズ、結果）
+
+elif page == "⑤ 競艇結果取込":
+    st.header("⑤ 競艇結果自動入力")
+    st.info("⚙️ 自動で公式サイトなどからレース結果を取得する機能（開発中）")
+
+st.markdown("---")
+st.markdown("#### 👤 制作者：小島崇彦")
