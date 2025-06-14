@@ -1,53 +1,45 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
 import os
+from datetime import datetime
 
-# CSVファイルパス
-CSV_PATH = "shinkanemaru_ai_manager/results.csv"
+st.title("② 勝敗入力")
 
-# 初期CSVが存在しない場合は作成
+CSV_PATH = "results.csv"
+
+# 🔧 ファイルが存在しない場合は初期化して作成
 if not os.path.exists(CSV_PATH):
-    df_init = pd.DataFrame(columns=["日時", "競艇場", "レース", "式別", "買い目", "賭金", "払戻", "的中"])
-    df_init.to_csv(CSV_PATH, index=False)
+    df_init = pd.DataFrame(columns=["日付", "競艇場", "レース", "賭金", "払戻金"])
+    df_init.to_csv(CSV_PATH, index=False, encoding="utf-8")
 
-st.subheader("② 勝敗入力")
-
-# 入力フォーム
-with st.form("input_form"):
+# 🎯 入力フォーム
+with st.form("bet_form"):
     col1, col2 = st.columns(2)
     with col1:
-        boat_place = st.text_input("競艇場名", placeholder="例: 住之江")
-        race_number = st.text_input("レース番号", placeholder="例: 1R")
-        bet_type = st.selectbox("式別", ["3連単", "3連複", "2連単", "2連複", "単勝", "複勝"])
+        date = st.date_input("日付", value=datetime.today())
+        stadium = st.text_input("競艇場名（例：住之江）")
+        race = st.text_input("レース番号（例：1R）")
     with col2:
-        bet = st.text_input("買い目", placeholder="例: 1-2-3")
-        bet_amount = st.number_input("賭金（円）", step=100, min_value=0)
-        payout = st.number_input("払戻（円）", step=100, min_value=0)
+        bet = st.number_input("賭金（円）", min_value=0, step=100)
+        payout = st.number_input("払戻金（円）", min_value=0, step=100)
 
-    submitted = st.form_submit_button("結果を記録")
+    submitted = st.form_submit_button("記録する")
 
-# 送信時の処理
-if submitted:
-    hit = payout > 0
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_data = {
-        "日時": now,
-        "競艇場": boat_place,
-        "レース": race_number,
-        "式別": bet_type,
-        "買い目": bet,
-        "賭金": bet_amount,
-        "払戻": payout,
-        "的中": "◯" if hit else "×"
-    }
+    if submitted:
+        if stadium and race:
+            new_data = pd.DataFrame([{
+                "日付": date.strftime('%Y/%m/%d'),
+                "競艇場": stadium,
+                "レース": race,
+                "賭金": bet,
+                "払戻金": payout
+            }])
 
-    df = pd.read_csv(CSV_PATH)
-    df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
-    df.to_csv(CSV_PATH, index=False)
-    st.success("結果を記録しました！")
+            # 保存処理
+            df = pd.read_csv(CSV_PATH)
+            df = pd.concat([df, new_data], ignore_index=True)
+            df.to_csv(CSV_PATH, index=False, encoding="utf-8")
 
-# 最新5件を表示
-st.markdown("#### 🔍 最近の入力結果")
-df_latest = pd.read_csv(CSV_PATH).tail(5)
-st.dataframe(df_latest, use_container_width=True)
+            st.success("記録しました ✅")
+        else:
+            st.warning("競艇場名とレース番号を入力してください。")
