@@ -1,8 +1,8 @@
 import streamlit as st
 from datetime import date
-from utils.calc_ecp import calculate_next_bet  # ECPロジック用関数
+from utils.calc_ecp import calculate_next_bet
 
-# 初期化
+# --- セッション初期化 ---
 if "results" not in st.session_state:
     st.session_state["results"] = []
 if "initial_fund" not in st.session_state:
@@ -10,48 +10,52 @@ if "initial_fund" not in st.session_state:
 if "target_amount" not in st.session_state:
     st.session_state["target_amount"] = 20000
 
-# 📄 ページタイトル
-st.title("② 勝敗入力")
+# --- タイトル ---
+st.title("② ECP戦略に基づく 勝敗入力")
 
-# 入力フォーム
-st.write("### 🎯 ECP戦略に基づく勝敗入力")
-
+# --- 入力フォーム ---
 col1, col2 = st.columns(2)
 with col1:
-    selected_date = st.date_input("日付", value=date.today())
+    input_date = st.date_input("日付", value=date.today())
     race_number = st.text_input("レース番号（例：1R）")
 with col2:
     place = st.text_input("競艇場名（例：住之江）")
-    odds = st.number_input("オッズ（例：3.5）", min_value=0.0, step=0.1)
+    odds = st.number_input("オッズ（例：3.5）", min_value=1.0, step=0.1)
 
-# ECPに基づいた次の賭け金を自動算出
-past_results = st.session_state["results"]
-next_bet = calculate_next_bet(past_results, st.session_state["initial_fund"], st.session_state["target_amount"])
+# --- 賭け金（自動計算） ---
+try:
+    wager = calculate_next_bet(
+        st.session_state["results"],
+        st.session_state["initial_fund"],
+        st.session_state["target_amount"]
+    )
+except Exception as e:
+    st.error(f"⚠️ 賭け金計算に失敗しました: {e}")
+    wager = 0
 
-# 自動表示
-st.number_input("賭け金（円）", min_value=0, step=100, value=next_bet, key="wager")
+st.number_input("賭け金（自動）", min_value=0, step=100, value=wager, key="wager")
 
-# 記録処理
+# --- 記録ボタン ---
 if st.button("📥 記録する"):
-    record = {
-        "date": selected_date.strftime("%Y/%m/%d"),
+    new_data = {
+        "date": input_date.strftime("%Y/%m/%d"),
         "place": place,
         "race": race_number,
         "wager": st.session_state["wager"],
         "odds": odds
     }
-    st.session_state["results"].append(record)
-    st.success("✅ 記録しました！")
+    st.session_state["results"].append(new_data)
+    st.success("✅ 記録しました")
 
-# ナビゲーション
+# --- ページ移動ボタン ---
 st.markdown("---")
-col_nav1, col_nav2, col_nav3 = st.columns(3)
-with col_nav1:
-    if st.button("⬅️ ① AI予想", use_container_width=True):
+colA, colB, colC = st.columns(3)
+with colA:
+    if st.button("⬅️ ① AI予想"):
         st.switch_page("pages/page1_ai_prediction.py")
-with col_nav2:
-    if st.button("📊 ③ 統計へ", use_container_width=True):
+with colB:
+    if st.button("📊 ③ 統計"):
         st.switch_page("pages/page3_statistics.py")
-with col_nav3:
-    if st.button("📋 ④ 結果履歴", use_container_width=True):
+with colC:
+    if st.button("📋 ④ 結果履歴"):
         st.switch_page("pages/page4_record_result.py")
