@@ -1,58 +1,61 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
-# 仮データ（今後CSV読み込み予定）
-if "df" not in st.session_state:
-    st.session_state.df = pd.DataFrame([
-        {"日付": "2025/06/13", "競艇場": "住之江", "レース": "1R", "賭金": 1000, "オッズ": 2.5, "的中": "的中"},
-        {"日付": "2025/06/13", "競艇場": "住之江", "レース": "2R", "賭金": 1000, "オッズ": 1.8, "的中": "不的中"},
-        {"日付": "2025/06/14", "競艇場": "戸田", "レース": "1R", "賭金": 500, "オッズ": 3.0, "的中": "的中"},
-        {"日付": "2025/06/14", "競艇場": "戸田", "レース": "2R", "賭金": 1000, "オッズ": 2.0, "的中": "不的中"},
-    ])
+CSV_PATH = "results.csv"
 
-df = st.session_state.df
+def load_data():
+    try:
+        df = pd.read_csv(CSV_PATH)
+        df["日付"] = pd.to_datetime(df["日付"], errors='coerce')
+        df.dropna(subset=["日付"], inplace=True)
+        return df
+    except Exception:
+        return pd.DataFrame(columns=["日付", "競艇場", "レース", "賭金", "オッズ", "的中"])
 
-# 統計計算
-total_bets = len(df)
-total_money = df["賭金"].sum()
-total_hits = df[df["的中"] == "的中"].shape[0]
-hit_rate = total_hits / total_bets * 100 if total_bets else 0
-recovery = (df[df["的中"] == "的中"]["オッズ"] * df[df["的中"] == "的中"]["賭金"]).sum()
-recovery_rate = recovery / total_money * 100 if total_money else 0
-win_rate = total_hits / total_bets * 100 if total_bets else 0
+def compute_set_stats(df):
+    if len(df) < 3:
+        return None
 
-# A. 統計表示
-st.markdown("## 📊 今までの統計")
-col1, col2, col3 = st.columns(3)
-col1.metric("総レース数", f"{total_bets} 回")
-col2.metric("総賭金", f"{total_money} 円")
-col3.metric("的中数", f"{total_hits} 回")
+    last_set = df.tail(3).copy()
+    total_bet = last_set["賭金"].sum()
+    payout = sum(last_set["賭金"] * last_set["オッズ"] * (last_set["的中"] == "的中"))
+    profit = payout - total_bet
+    win_count = (last_set["的中"] == "的中").sum()
+    recovery_rate = round(payout / total_bet * 100, 1) if total_bet > 0 else 0
 
-col1, col2, col3 = st.columns(3)
-col1.metric("的中率", f"{hit_rate:.1f} %")
-col2.metric("回収率", f"{recovery_rate:.1f} %")
-col3.metric("勝率", f"{win_rate:.1f} %")
+    return {
+        "セット件数": len(last_set),
+        "総賭金": total_bet,
+        "総回収": payout,
+        "利益": profit,
+        "的中数": win_count,
+        "回収率": recovery_rate,
+        "詳細": last_set.reset_index(drop=True)
+    }
 
-st.markdown("---")
+def page_statistics():
+    st.markdown("### 📊 ECP1セット（直近3件）の統計")
 
-# B. 最新レース（削除付き）
-st.markdown("## 🎯 最新の1レース結果")
+    df = load_data()
+    if df.empty:
+        st.info("データがまだ記録されていません。")
+        return
 
-if len(df) > 0:
-    latest = df.iloc[-1]
-    回収金 = latest["賭金"] * latest["オッズ"] if latest["的中"] == "的中" else 0
-    利益 = 回収金 - latest["賭金"]
+    stats = compute_set_stats(df)
+    if not stats:
+        st.warning("まだ3件分の記録がないため、ECPセットが完成していません。")
+        return
 
-    st.write(f"📅 日付: {latest['日付']} / 🏟️ {latest['競艇場']} {latest['レース']}")
-    st.write(f"💰 賭金: {latest['賭金']} 円 / 🎯 オッズ: {latest['オッズ']}")
-    st.write(f"📌 的中: {latest['的中']} / 💸 回収金: {回収金:.0f} 円 / 📈 利益: {利益:.0f} 円")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("🎯 的中数", f"{stats['的中数']} / 3")
+        st.metric("💰 総賭金", f"{int(stats['総賭金'])} 円")
+    with col2:
+        st.metric("📈 回収率", f"{stats['回収率']} %")
+        st.metric("📉 利益", f"{int(stats['利益'])} 円")
 
-    if st.button("🗑️ 最新レースを削除（クリア）"):
-        st.session_state.df = df.iloc[:-1]
-        st.experimental_rerun()
-else:
-    st.info("表示する最新レースがありません。")
+    with st.expander("📄 セット詳細"):
+        st.dataframe(stats["詳細"])
 
-st.markdown("---")
-st.markdown("### 📝 記録一覧")
-st.dataframe(df, use_container_width=True)
+page_statistics()
