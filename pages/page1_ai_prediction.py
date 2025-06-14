@@ -1,64 +1,82 @@
 import streamlit as st
-from datetime import datetime
+import datetime
 import random
 
-# タイトル
-st.title("① AI予想")
-st.markdown("---")
+# ページ設定
+st.set_page_config(page_title="① AI予想", layout="wide")
 
-# 現在時刻（日本時間）
-jst_now = datetime.utcnow().astimezone().strftime("⏰ %Y/%m/%d %H:%M:%S（日本時間）")
-st.markdown(f"<h4 style='text-align: center;'>{jst_now}</h4>", unsafe_allow_html=True)
-st.markdown("---")
+# 日本時間での現在時刻表示（中央・太字）
+now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+st.markdown(f"<h4 style='text-align:center; font-weight:bold;'>現在時刻（日本時間）: {now.strftime('%Y/%m/%d %H:%M:%S')}</h4>", unsafe_allow_html=True)
 
-# ✅ 競艇場名とレース番号のプルダウン
-boat_courses = [
-    "住之江", "尼崎", "若松", "丸亀", "平和島", "蒲郡", "徳山", "児島", "びわこ", "大村", "芦屋", "唐津"
-]
-race_numbers = [f"{i}R" for i in range(1, 13)]
+# タイトル表示
+st.markdown("## 🎯 AI予想（上位5件）")
 
-col1, col2 = st.columns(2)
-selected_course = col1.selectbox("🏁 競艇場", boat_courses)
-selected_race = col2.selectbox("🎲 レース番号", race_numbers)
+# 仮のAI予想データ（最低オッズ1.5以上・全競艇場想定）
+def generate_predictions():
+    places = ["住之江", "戸田", "平和島", "蒲郡", "多摩川", "丸亀", "芦屋", "若松", "大村"]
+    shiki_list = ["3連単", "2連単", "3連複", "2連複", "単勝", "複勝"]
+    predictions = []
 
-# 仮ではない予想表示形式
-formats = ["3連単", "3連複", "2連単", "2連複", "単勝", "複勝"]
-def generate_prediction():
-    f = random.choice(formats)
-    if f in ["3連単", "3連複"]:
-        nums = random.sample(range(1, 7), 3)
-        return f, f"{nums[0]}-{nums[1]}-{nums[2]}" if f == "3連単" else f"{nums[0]}={nums[1]}={nums[2]}"
-    elif f in ["2連単", "2連複"]:
-        nums = random.sample(range(1, 7), 2)
-        return f, f"{nums[0]}-{nums[1]}" if f == "2連単" else f"{nums[0]}={nums[1]}"
-    else:
-        num = random.randint(1, 6)
-        return f, str(num)
+    for _ in range(20):  # 多めに生成して上位5件を抽出
+        place = random.choice(places)
+        race = f"{random.randint(1, 12)}R"
+        shiki = random.choice(shiki_list)
+        if shiki == "3連単":
+            content = f"{random.randint(1,6)}-{random.randint(1,6)}-{random.randint(1,6)}"
+        elif shiki == "3連複":
+            a, b, c = sorted(random.sample(range(1, 7), 3))
+            content = f"{a}={b}={c}"
+        elif shiki == "2連単":
+            content = f"{random.randint(1,6)}-{random.randint(1,6)}"
+        elif shiki == "2連複":
+            a, b = sorted(random.sample(range(1, 7), 2))
+            content = f"{a}={b}"
+        else:
+            content = str(random.randint(1,6))
+        odds = round(random.uniform(1.5, 10.0), 1)
+        predictions.append({
+            "競艇場": place,
+            "レース": race,
+            "式別": shiki,
+            "予想": content,
+            "オッズ": odds
+        })
 
-# 上位5予想（オッズは1.5倍以上）
-st.subheader("🤖 本日のAIによる予想（上位5件）")
-data = []
-for i in range(5):
-    f_type, prediction = generate_prediction()
-    odds = round(random.uniform(1.5, 20.0), 2)
-    data.append((selected_course, selected_race, f_type, prediction, odds))
+    # オッズ1.5以上の中から上位5件表示
+    predictions.sort(key=lambda x: x["odds"], reverse=True)
+    return predictions[:5]
 
-import pandas as pd
-df = pd.DataFrame(data, columns=["競艇場", "レース", "式別", "予想", "オッズ"])
-st.dataframe(df, use_container_width=True)
+# 予想表示
+predictions = generate_predictions()
 
-# ページ下部にナビゲーションボタン
+for i, p in enumerate(predictions, 1):
+    st.markdown(f"### 🔹 第{i}位")
+    st.markdown(f"- 競艇場: **{p['競艇場']}**")
+    st.markdown(f"- レース番号: **{p['レース']}**")
+    st.markdown(f"- 式別: **{p['式別']}**")
+    st.markdown(f"- 予想: **{p['予想']}**")
+    st.markdown(f"- オッズ: **{p['オッズ']}倍**")
+    st.divider()
+
+# ナビゲーションボタン（ページ下部）
 st.markdown("---")
 col1, col2, col3, col4, col5 = st.columns(5)
-if col1.button("① AI予想"):
-    st.switch_page("pages/page1_ai_prediction.py")
-if col2.button("② 勝敗入力"):
-    st.switch_page("pages/page2_input_result.py")
-if col3.button("③ 統計データ"):
-    st.switch_page("pages/page3_statistics.py")
-if col4.button("④ 結果履歴"):
-    st.switch_page("pages/page4_record_result.py")
-if col5.button("⑤ 競艇結果"):
-    st.switch_page("pages/page5_boat_results.py")
+with col1:
+    if st.button("① AI予想"):
+        st.switch_page("pages/page1_ai_prediction.py")
+with col2:
+    if st.button("② 勝敗入力"):
+        st.switch_page("pages/page2_input_result.py")
+with col3:
+    if st.button("③ 統計データ"):
+        st.switch_page("pages/page3_statistics.py")
+with col4:
+    if st.button("④ 結果履歴"):
+        st.switch_page("pages/page4_record_result.py")
+with col5:
+    if st.button("⑤ 競艇結果"):
+        st.switch_page("pages/page5_boat_results.py")
 
-st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
+# 最下部に制作者名
+st.markdown("<div style='text-align:center; font-size:13px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
