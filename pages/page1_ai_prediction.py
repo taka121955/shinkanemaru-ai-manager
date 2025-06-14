@@ -1,23 +1,48 @@
 import streamlit as st
 import pandas as pd
+import os
 from datetime import datetime
 
-# ページタイトル
-st.subheader("① AI予想（的中率順 上位5件）")
+st.title("① AI予想入力")
 
-# 仮のAI予想データ（※後で本物に差し替え可能）
-ai_predictions = [
-    {"競艇場": "住之江", "レース": "1R", "式別": "3連単", "買い目": "1-3-4", "的中率": 85},
-    {"競艇場": "多摩川", "レース": "2R", "式別": "2連単", "買い目": "2-5", "的中率": 81},
-    {"競艇場": "浜名湖", "レース": "3R", "式別": "3連単", "買い目": "3-2-6", "的中率": 78},
-    {"競艇場": "丸亀", "レース": "5R", "式別": "2連複", "買い目": "1-4", "的中率": 74},
-    {"競艇場": "芦屋", "レース": "6R", "式別": "3連複", "買い目": "2-3-5", "的中率": 70},
-]
+CSV_PATH = "ai_predictions.csv"
 
-# 表示（的中率順に並び替え済み）
-df = pd.DataFrame(ai_predictions)
-st.table(df)
+# 初期化：ファイルが存在しない場合は作成（オッズ列あり）
+if not os.path.exists(CSV_PATH):
+    df_init = pd.DataFrame(columns=["日付", "競艇場", "レース", "オッズ", "賭金", "的中"])
+    df_init.to_csv(CSV_PATH, index=False, encoding="utf-8")
 
-# 現在日時（日本時間）
-japan_time = datetime.utcnow().astimezone().strftime("%Y/%m/%d %H:%M")
-st.caption(f"更新時刻（日本時間）: {japan_time}")
+# 読み込み：エラー回避（空のとき）
+try:
+    df = pd.read_csv(CSV_PATH)
+except pd.errors.EmptyDataError:
+    df = pd.DataFrame(columns=["日付", "競艇場", "レース", "オッズ", "賭金", "的中"])
+    df.to_csv(CSV_PATH, index=False, encoding="utf-8")
+
+# 入力フォーム
+with st.form("ai_form"):
+    col1, col2 = st.columns(2)
+    with col1:
+        date = st.date_input("日付", value=datetime.today())
+        stadium = st.text_input("競艇場（例：住之江）")
+        race = st.text_input("レース番号（例：1R）")
+    with col2:
+        odds = st.number_input("オッズ（倍率）", min_value=1.0, step=0.1)
+        bet = st.number_input("賭金（円）", min_value=0, step=100)
+        result = st.selectbox("的中状況", ["的中", "不的中"])
+
+    submitted = st.form_submit_button("記録する")
+
+    if submitted:
+        new_row = pd.DataFrame([{
+            "日付": date.strftime('%Y/%m/%d'),
+            "競艇場": stadium,
+            "レース": race,
+            "オッズ": odds,
+            "賭金": bet,
+            "的中": result
+        }])
+
+        df = pd.concat([df, new_row], ignore_index=True)
+        df.to_csv(CSV_PATH, index=False, encoding="utf-8")
+        st.success("✅ AI予想を記録しました！")
