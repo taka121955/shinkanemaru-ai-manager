@@ -1,15 +1,17 @@
 import streamlit as st
 from datetime import datetime
 
+# ✅ ページ設定：サイドバー非表示・レイアウト横長
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ✅ サイドバー完全非表示（CSS）
+# ✅ サイドバー強制非表示
 st.markdown("""
 <style>
+/* サイドバーを完全に消す */
 .css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
     display: none !important;
 }
@@ -20,7 +22,7 @@ st.markdown("""
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
-# ✅ 資金情報
+# ✅ 資金情報表示
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積資金：7200円
@@ -29,13 +31,13 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ 安定レイアウト（3列 × 2段 グリッド調整済）
+# ✅ スマートに整列したナビゲーションボタン（軽量化＆中央揃え）
 st.markdown("""
 <style>
 .button-grid {
     display: grid;
-    grid-template-columns: repeat(3, 180px);
-    gap: 18px;
+    grid-template-columns: repeat(3, 160px);  /* 横3列で中央揃え */
+    gap: 14px;
     justify-content: center;
     margin-top: 30px;
     margin-bottom: 30px;
@@ -43,8 +45,8 @@ st.markdown("""
 .button-grid a {
     display: block;
     text-align: center;
-    padding: 16px 0;
-    font-size: 16px;
+    padding: 10px 0;  /* ✅ 高さ調整済み */
+    font-size: 15px;  /* ✅ フォント調整済み */
     font-weight: bold;
     background-color: #e6f0ff;
     color: #003366;
@@ -55,7 +57,7 @@ st.markdown("""
 }
 .button-grid a:hover {
     background-color: #d0e4ff;
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 </style>
 
