@@ -20,24 +20,21 @@ st.markdown(
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# ✅ 2列×2段でボタン配置（確実に横並び）
+# ✅ 横並び2列×2段のボタン（HTML＋Streamlitの組合せで崩れない）
 col1, col2 = st.columns(2)
 with col1:
-    if st.button("①AI予想"):
+    if st.button("①AI予想", key="btn1"):
         st.session_state.page = "①AI予想"
-with col2:
-    if st.button("②勝敗入力"):
-        st.session_state.page = "②勝敗入力"
-
-col3, col4 = st.columns(2)
-with col3:
-    if st.button("③統計データ"):
+    if st.button("③統計データ", key="btn3"):
         st.session_state.page = "③統計データ"
-with col4:
-    if st.button("④結果履歴"):
+
+with col2:
+    if st.button("②勝敗入力", key="btn2"):
+        st.session_state.page = "②勝敗入力"
+    if st.button("④結果履歴", key="btn4"):
         st.session_state.page = "④結果履歴"
 
-# ✅ ページ切り替え
+# ✅ ページ切替
 if st.session_state.page == "①AI予想":
     show_page1()
 elif st.session_state.page == "②勝敗入力":
