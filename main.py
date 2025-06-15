@@ -7,7 +7,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ✅ サイドバー完全非表示
+# ✅ サイドバー非表示
 st.markdown("""
 <style>
 .css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
@@ -16,10 +16,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ 上部：現在時刻・資金（見やすく強調）
+# ✅ 上部：現在時刻・資金情報
 jst = datetime.utcnow().astimezone()
 st.markdown(f"""
-<div style='text-align: center; margin-top: 10px; margin-bottom: 10px;'>
+<div style='text-align: center; margin-top: 10px;'>
   <div style='font-size:16px;'>🕒 現在時刻（日本時間）</div>
   <div style='font-size:24px; font-weight:bold;'>{jst.strftime('%Y/%m/%d %H:%M:%S')}</div>
 </div>
@@ -29,27 +29,27 @@ st.markdown("""
 <div style='text-align: center; font-size: 16px; line-height: 2em; margin-bottom: 10px;'>
 🎯 <b>目標金額：10000円</b>　💰 <b>初期資金：5000円</b>　📊 <b>累積資金：7200円</b>
 </div>
-<hr style='margin: 12px 0;'>
+<hr style='margin: 10px 0;'>
 """, unsafe_allow_html=True)
 
-# ✅ ナビボタン：大きめ＆中央整列
+# ✅ ナビボタン：ボタン少し小さく、文字大きく
 st.markdown("""
 <style>
 .button-grid {
     display: grid;
-    grid-template-columns: repeat(3, 150px);
-    gap: 12px;
+    grid-template-columns: repeat(3, 130px);
+    gap: 10px;
     justify-content: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 .button-grid a {
     display: block;
-    padding: 10px 0;
-    font-size: 15px;
+    padding: 8px 0;
+    font-size: 16px;
     font-weight: bold;
     font-family: "ヒラギノ角ゴ ProN", "游ゴシック", sans-serif;
     text-align: center;
-    background-color: #f0f7ff;
+    background-color: #f2f8ff;
     color: #003366;
     border: 2px solid #4a90e2;
     border-radius: 6px;
@@ -58,7 +58,7 @@ st.markdown("""
 }
 .button-grid a:hover {
     background-color: #e2efff;
-    transform: scale(1.03);
+    transform: scale(1.04);
 }
 </style>
 
