@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-from pages.page1_ai_prediction import show_ai_prediction  # 必要に応じて他ページも追加
+from pages.page1_ai_prediction import show_ai_prediction  # ← ページ①の中身
 
 # ✅ ページ設定
 st.set_page_config(
@@ -9,19 +9,17 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ✅ 時刻・資金表示
+# ✅ 現在時刻と資金表示
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
-
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
 </div>
 """, unsafe_allow_html=True)
-
 st.markdown("---")
 
-# ✅ ボタンデザイン（2段×3列・ページ遷移形式）
+# ✅ ボタン群（2段3列）
 st.markdown("""
 <style>
 .button-container {
@@ -62,9 +60,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ URLパラメータでページ判定（遷移表示）
-page = st.query_params.get("page", "0")
+# ✅ 正しいクエリ取得方法
+params = st.experimental_get_query_params()
+page = params.get("page", ["0"])[0]  # "page" の値を取得
 
+# ✅ 遷移先のページ表示（①だけ有効）
 if page == "1":
     show_ai_prediction()
 elif page == "2":
