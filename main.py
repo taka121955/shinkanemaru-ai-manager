@@ -7,30 +7,32 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ✅ サイドバー完全非表示
+# ✅ サイドバー強制非表示
 st.markdown("""
 <style>
-/* サイドバー強制非表示 */
 .css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
     display: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ 現在時刻（JST）
+# ✅ 上部（時刻・資金情報）をスッキリ構成
 jst = datetime.utcnow().astimezone()
-st.markdown(f"<h5 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h5>", unsafe_allow_html=True)
-
-# ✅ 資金情報（フォント縮小）
-st.markdown("""
-<div style='text-align: center; font-size: 14px;'>
-🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積資金：7200円
+st.markdown(f"""
+<div style='text-align: center; margin-top: 5px; margin-bottom: 3px;'>
+  <span style='font-size: 13px;'>🕒 現在時刻（日本時間）：</span><br>
+  <span style='font-size: 20px; font-weight: bold;'>{jst.strftime('%Y/%m/%d %H:%M:%S')}</span>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
+st.markdown("""
+<div style='text-align: center; font-size: 13px; margin-bottom: 10px;'>
+🎯 目標金額：<b>10000円</b>　💰 初期資金：<b>5000円</b>　📊 累積資金：<b>7200円</b>
+</div>
+<hr style='margin: 8px 0;'>
+""", unsafe_allow_html=True)
 
-# ✅ 最もスリムなボタン構成（3列 × 2段）
+# ✅ コンパクトナビボタン（3列2段・中央揃え）
 st.markdown("""
 <style>
 .button-grid {
@@ -68,6 +70,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ フッター（小さめ）
+# ✅ フッター（軽めに）
 st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center; font-size: 12px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
