@@ -1,3 +1,8 @@
+import streamlit as st
+from datetime import datetime  # ← これが必要です！
+
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="wide")
+
 # ✅ 改善版：現在時刻と資金情報（パッと見やすく）
 jst = datetime.utcnow().astimezone()
 
