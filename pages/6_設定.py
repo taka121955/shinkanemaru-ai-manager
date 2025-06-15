@@ -1,46 +1,39 @@
 import streamlit as st
-import datetime
 import json
 import os
 
-# ページ設定と背景色
-st.set_page_config(page_title="資金マネージャー", layout="centered")
-st.markdown("<style>body { background-color: #fff9db; }</style>", unsafe_allow_html=True)
+# 保存先ファイルパス
+DATA_FILE = "utils/funds.json"
 
-# 🔄 資金データの読み込み
+# 💾 保存関数
+def save_funds(goal, reserve, saving):
+    data = {
+        "target": goal,
+        "reserve": reserve,
+        "savings": saving
+    }
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+# 🔁 読み込み関数
 def load_funds():
-    if os.path.exists("utils/funds.json"):
-        with open("utils/funds.json", "r", encoding="utf-8") as f:
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return {"target": 0, "reserve": 0, "savings": 0}
 
+# 🎯 ページタイトル
+st.set_page_config(page_title="資金設定", layout="centered")
+st.markdown("<style>body { background-color: #fff9db; }</style>", unsafe_allow_html=True)
+
+# 📊 現在値の読み込み
 funds = load_funds()
+st.markdown("## 💼 資金設定")
+goal = st.number_input("🎯 目標金額", value=funds["target"], step=100)
+reserve = st.number_input("💼 準備金額", value=funds["reserve"], step=100)
+saving = st.number_input("📦 積立金額", value=funds["savings"], step=100)
 
-# 💰 現在の資金状況（最上部に大きく）
-st.markdown("### 💰 <b>現在の資金状況</b>", unsafe_allow_html=True)
-st.markdown(f"<h3>🎯 目標金額：<span style='color:blue;'>{funds['target']:,}円</span></h3>", unsafe_allow_html=True)
-st.markdown(f"<h3>💼 準備金額：<span style='color:green;'>{funds['reserve']:,}円</span></h3>", unsafe_allow_html=True)
-st.markdown(f"<h3>📦 積立金額：<span style='color:orange;'>{funds['savings']:,}円</span></h3>", unsafe_allow_html=True)
-
-# ⏰ 現在時刻（強調表示）
-japan_time = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
-st.markdown(
-    f"<div style='text-align:center; font-size:28px; font-weight:bold;'>⏰ 現在時刻：<span style='color:#007f00;'>{japan_time.strftime('%Y/%m/%d %H:%M:%S')}</span></div>",
-    unsafe_allow_html=True
-)
-
-# 📂 メニュー（2列 × 3行で配置）
-st.markdown("### 📁 メニュー（表示専用）")
-col1, col2 = st.columns(2)
-with col1:
-    st.button("①AI予想", use_container_width=True)
-    st.button("③統計データ", use_container_width=True)
-    st.button("⑤競艇結果", use_container_width=True)
-with col2:
-    st.button("②勝敗入力", use_container_width=True)
-    st.button("④結果履歴", use_container_width=True)
-    st.button("⑥資金設定", use_container_width=True)
-
-# 📌 制作者表記
-st.markdown("---")
-st.markdown("#### 制作：小島崇彦")
+# ✅ セットボタン
+if st.button("💾 この内容でセットする", use_container_width=True):
+    save_funds(goal, reserve, saving)
+    st.success("✅ 資金データを保存しました！")
