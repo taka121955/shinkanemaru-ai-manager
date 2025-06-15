@@ -21,18 +21,29 @@ st.markdown(
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# ✅ ボタンを5つ横並びにする
-cols = st.columns(5)
-if cols[0].button("①AI予想"):
-    st.session_state.page = "①AI予想"
-if cols[1].button("②勝敗入力"):
-    st.session_state.page = "②勝敗入力"
-if cols[2].button("③統計データ"):
-    st.session_state.page = "③統計データ"
-if cols[3].button("④結果履歴"):
-    st.session_state.page = "④結果履歴"
-if cols[4].button("⑤競艇結果"):
-    st.session_state.page = "⑤競艇結果"
+# ✅ ボタン配置：2段×3列をスマホ対応で中央揃え
+with st.container():
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("①AI予想"):
+            st.session_state.page = "①AI予想"
+    with c2:
+        if st.button("②勝敗入力"):
+            st.session_state.page = "②勝敗入力"
+    with c3:
+        if st.button("③統計データ"):
+            st.session_state.page = "③統計データ"
+
+with st.container():
+    c4, c5, c6 = st.columns([1, 1, 1])
+    with c4:
+        if st.button("④結果履歴"):
+            st.session_state.page = "④結果履歴"
+    with c5:
+        if st.button("⑤競艇結果"):
+            st.session_state.page = "⑤競艇結果"
+    with c6:
+        st.markdown("")  # 空白
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -48,6 +59,6 @@ elif st.session_state.page == "④結果履歴":
 elif st.session_state.page == "⑤競艇結果":
     show_page5()
 
-# ✅ フッター（中央寄せ）
+# ✅ フッター
 st.markdown("---")
 st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
