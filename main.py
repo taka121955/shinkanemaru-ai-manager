@@ -1,60 +1,46 @@
 import streamlit as st
 from datetime import datetime
 
-# ページ背景をライトイエローに変更
-st.markdown(
-    """
+# ページ設定
+st.set_page_config(page_title="AI資金マネージャー", layout="centered")
+
+# 背景色（淡い黄色）
+st.markdown("""
     <style>
-    [data-testid="stAppViewContainer"] {
-        background-color: #fffce6;
-    }
-    .menu-button {
-        background-color: #f0f0f0;
-        border-radius: 10px;
-        padding: 8px 24px;
-        margin: 6px;
-        font-weight: bold;
-        border: 1px solid #ccc;
-        color: #333;
-        display: inline-block;
-    }
-    .menu-section {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+    .stApp {
+        background-color: #fff9db;
     }
     </style>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
-# タイトルと説明
-st.markdown("## 👜 新金丸法 × AI資金マネージャー")
-st.markdown("##### 以下のページを選択してください")
+# 日本時間の現在時刻を表示
+now = datetime.now()
+japan_time = now.strftime("%Y/%m/%d %H:%M:%S")
+st.markdown(f"⏰ **現在時刻：** `{japan_time}`")
 
-# メニューボタン（表示専用）
-st.markdown("<div class='menu-section'>", unsafe_allow_html=True)
-menu_labels = [
-    "① AI予想", "② 勝敗入力", "③ 統計データ",
-    "④ 結果履歴", "⑤ 競艇結果", "⑥ 資金設定"
-]
-for label in menu_labels:
-    st.markdown(f"<div class='menu-button'>{label}</div>", unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
+# 目標・準備・積立金をセッションから取得（なければ0）
+target_amount = st.session_state.get("target_amount", 0)
+reserve_amount = st.session_state.get("reserve_amount", 0)
+accumulated_amount = st.session_state.get("accumulated_amount", 0)
 
-# スペース
+# メニュー表示（2列構成）
+st.markdown("### 🗂️ メニュー（表示専用）")
+
+col1, col2 = st.columns(2)
+with col1:
+    st.button("①AI予想", use_container_width=True)
+    st.button("③統計データ", use_container_width=True)
+    st.button("⑤競艇結果", use_container_width=True)
+with col2:
+    st.button("②勝敗入力", use_container_width=True)
+    st.button("④結果履歴", use_container_width=True)
+    st.button("⑥資金設定", use_container_width=True)
+
+# 資金状況の表示
 st.markdown("---")
-
-# 現在の資金状況
-target_amount = 50000
-reserve_amount = 10000
-saving_amount = 3000
-
 st.markdown("### 💰 現在の資金状況")
-st.markdown(f"🎯 <b>目標金額：</b> <span style='color:blue;'>{target_amount:,}円</span>", unsafe_allow_html=True)
-st.markdown(f"💼 <b>準備金額：</b> <span style='color:green;'>{reserve_amount:,}円</span>", unsafe_allow_html=True)
-st.markdown(f"📦 <b>積立金額：</b> <span style='color:orange;'>{saving_amount:,}円</span>", unsafe_allow_html=True)
+st.markdown(f"🎯 **目標金額：** <span style='color:blue;'>{target_amount:,}円</span>", unsafe_allow_html=True)
+st.markdown(f"💼 **準備金額：** <span style='color:green;'>{reserve_amount:,}円</span>", unsafe_allow_html=True)
+st.markdown(f"📦 **積立金額：** <span style='color:orange;'>{accumulated_amount:,}円</span>", unsafe_allow_html=True)
 
-# 制作クレジット
-st.markdown("---")
-st.markdown("#### 制作：小島崇彦")
+# 制作者表示は非表示（削除済み）
