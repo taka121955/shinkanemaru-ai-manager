@@ -2,42 +2,44 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-RESULTS_CSV = "results.csv"
+st.markdown("### ✍️ 勝敗入力")
 
-def show_page():
-    st.markdown("## ② 勝敗入力")
-    st.markdown("レースの結果を以下のフォームから入力してください。")
+# 入力フォーム
+with st.form("input_form"):
+    col1, col2 = st.columns(2)
+    with col1:
+        place = st.selectbox("競艇場", ["丸亀", "平和島", "常滑", "若松", "福岡"])
+        race = st.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
+        bet_type = st.selectbox("式別", ["単勝", "2連単", "3連単"])
+    with col2:
+        bet = st.text_input("賭け内容（例：1-3、2-5-6）")
+        amount = st.number_input("賭け金額（円）", min_value=100, step=100)
+        result = st.radio("結果", ["的中", "外れ"])
+        payout = st.number_input("払戻金額（的中時のみ）", min_value=0, step=100)
 
-    # 入力フォーム
-    with st.form("result_form"):
-        date = st.date_input("📅 日付", datetime.now().date())
-        location = st.text_input("🏟️ 競艇場名")
-        race_no = st.text_input("🎯 レース番号")
-        bet_type = st.selectbox("🎫 式別", ["単勝", "複勝", "2連単", "3連単"])
-        selected_boat = st.text_input("🚤 購入した艇番")
-        amount = st.number_input("💴 賭け金（円）", min_value=100, step=100)
-        result = st.selectbox("✅ 結果", ["的中", "不的中"])
-        payout = st.number_input("🎉 払戻金（円）", min_value=0, step=100)
+    submitted = st.form_submit_button("記録する")
 
-        submitted = st.form_submit_button("入力を保存")
+# 保存処理
+if submitted:
+    new_row = {
+        "日時": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "競艇場": place,
+        "レース": race,
+        "式別": bet_type,
+        "賭け内容": bet,
+        "賭け金額": amount,
+        "結果": result,
+        "払戻金額": payout if result == "的中" else 0
+    }
 
-    if submitted:
-        new_data = {
-            "日付": date.strftime('%Y-%m-%d'),
-            "競艇場": location,
-            "レース番号": race_no,
-            "式別": bet_type,
-            "艇番": selected_boat,
-            "賭け金": amount,
-            "結果": result,
-            "払戻金": payout
-        }
+    try:
+        df = pd.read_csv("results.csv")
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+    except:
+        df = pd.DataFrame([new_row])
 
-        try:
-            df = pd.read_csv(RESULTS_CSV)
-        except FileNotFoundError:
-            df = pd.DataFrame()
+    df.to_csv("results.csv", index=False)
+    st.success("✅ 記録が保存されました！")
 
-        df = df.append(new_data, ignore_index=True)
-        df.to_csv(RESULTS_CSV, index=False)
-        st.success("結果が保存されました！")
+    with st.expander("📋 最新の入力内容"):
+        st.write(pd.DataFrame([new_row]))
