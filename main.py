@@ -1,7 +1,6 @@
 import streamlit as st
 from datetime import datetime
 
-# ページ設定
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
@@ -21,7 +20,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ 改良デザイン：ボタンUI（見やすさ重視）
+# ✅ 完全統一ボタンスタイル（幅・高さ・字揃えまで統一）
 st.markdown("""
 <style>
 .button-container {
@@ -35,7 +34,9 @@ st.markdown("""
     margin: 0;
 }
 .button-container button {
-    padding: 14px 26px;
+    width: 150px;
+    height: 60px;
+    padding: 10px;
     font-size: 17px;
     font-weight: bold;
     border: 2px solid #4a90e2;
