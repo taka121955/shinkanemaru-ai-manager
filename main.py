@@ -8,53 +8,36 @@ from pages.page4_record_result import show_page as show_page4
 
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ⏰ 日本時間の表示
+# ✅ 現在の日本時間を表示
 now = datetime.utcnow() + timedelta(hours=9)
 jst = now.strftime('%Y/%m/%d %H:%M:%S')
 st.markdown(
-    f"<div style='text-align:center; font-size:24px;'>🕰️ 現在の時刻（日本時間）<br>{jst}</div><hr>",
+    f"<div style='text-align:center; font-size:22px;'>🕰️ 現在の時刻（日本時間）<br><b>{jst}</b></div><hr>",
     unsafe_allow_html=True
 )
 
-# 🔄 ページ記録用セッション
+# ✅ ページ記録
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# 🧭 2列×2段 ボタンレイアウト（CSS固定）
-st.markdown("""
-    <style>
-    .button-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        max-width: 400px;
-        margin: 0 auto;
-        margin-bottom: 25px;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ✅ 2列ボタン中央配置（スマホでも安定する幅）
+st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
 
-st.markdown("<div class='button-grid'>", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([1, 1])
 with col1:
-    if st.button("①AI予想"):
+    if st.button("①AI予想", use_container_width=True):
         st.session_state.page = "①AI予想"
-with col2:
-    if st.button("②勝敗入力"):
-        st.session_state.page = "②勝敗入力"
-
-col3, col4 = st.columns(2)
-with col3:
-    if st.button("③統計データ"):
+    if st.button("③統計データ", use_container_width=True):
         st.session_state.page = "③統計データ"
-with col4:
-    if st.button("④結果履歴"):
+with col2:
+    if st.button("②勝敗入力", use_container_width=True):
+        st.session_state.page = "②勝敗入力"
+    if st.button("④結果履歴", use_container_width=True):
         st.session_state.page = "④結果履歴"
 
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div><br>", unsafe_allow_html=True)
 
-# 📄 ページ表示切り替え
+# ✅ ページ切り替え
 if st.session_state.page == "①AI予想":
     show_page1()
 elif st.session_state.page == "②勝敗入力":
@@ -64,6 +47,6 @@ elif st.session_state.page == "③統計データ":
 elif st.session_state.page == "④結果履歴":
     show_page4()
 
-# 👤 フッター中央
+# ✅ フッター
 st.markdown("---")
 st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
