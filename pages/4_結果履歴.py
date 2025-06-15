@@ -2,35 +2,33 @@
 
 import streamlit as st
 import pandas as pd
-import os
 
-def show_page():
-    st.header("④結果履歴")
+st.markdown("## 📖 結果履歴")
 
-    csv_path = "results.csv"
+csv_path = "results.csv"
 
-    if os.path.exists(csv_path):
-        df = pd.read_csv(csv_path)
+try:
+    df = pd.read_csv(csv_path)
 
-        if df.empty:
-            st.info("📭 現在、記録されている結果はありません。")
-        else:
-            st.dataframe(df, use_container_width=True)
-
-            # 並べ替えオプション
-            sort_column = st.selectbox("🔽 並び替え列を選択", df.columns)
-            sort_order = st.radio("順序", ["昇順", "降順"], horizontal=True)
-            sorted_df = df.sort_values(by=sort_column, ascending=(sort_order == "昇順"))
-            st.dataframe(sorted_df, use_container_width=True)
-
-            # CSVダウンロード
-            csv = sorted_df.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="📥 CSVとしてダウンロード",
-                data=csv,
-                file_name='結果履歴.csv',
-                mime='text/csv'
-            )
-
+    if df.empty:
+        st.info("まだ登録された記録がありません。")
     else:
-        st.warning("⚠️ 結果ファイル（results.csv）がまだ存在していません。")
+        df_display = df.copy()
+        df_display.index += 1
+        df_display = df_display.rename_axis("No.")
+        df_display = df_display.rename(columns={
+            "日付": "🗓 日付",
+            "競艇場": "🚩 競艇場",
+            "式別": "📘 式別",
+            "投票内容": "✏️ 投票内容",
+            "賭け金": "💰 賭け金",
+            "的中": "🎯 的中",
+            "オッズ": "📈 オッズ",
+        })
+
+        st.dataframe(df_display, use_container_width=True)
+
+except FileNotFoundError:
+    st.warning("結果ファイルが見つかりません。まだ登録されていない可能性があります。")
+except pd.errors.EmptyDataError:
+    st.warning("結果ファイルが空です。")
