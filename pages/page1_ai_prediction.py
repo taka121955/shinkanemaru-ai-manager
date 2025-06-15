@@ -1,12 +1,12 @@
+import streamlit as st
+import requests
+from datetime import datetime
+from bs4 import BeautifulSoup
+import random
+
 def show_ai_prediction():
-    import requests
-    from bs4 import BeautifulSoup
-    import random
-
     st.markdown("### 🎯 本日のAI予想（的中率重視）")
-    st.markdown("※ 現在は仮のAI予想。近日中に本番モデルに切り替わります。")
 
-    # 全国24競艇場の今日の日付付きURLを生成
     def fetch_today_race_urls():
         base_url = "https://www.boatrace.jp/owpc/pc/race/racelist"
         today = datetime.now().strftime("%Y%m%d")
@@ -17,7 +17,6 @@ def show_ai_prediction():
             race_urls.append((jcd_str, url))
         return race_urls
 
-    # 競艇場タイトルの取得
     def extract_race_info(jcd_str, url):
         try:
             res = requests.get(url, timeout=10)
@@ -30,7 +29,6 @@ def show_ai_prediction():
         except:
             return f"競艇場 {jcd_str}（取得失敗）"
 
-    # 仮のAI予想ロジック（ダミー）
     def generate_fake_prediction():
         式別 = random.choice(["3連単", "2連単", "単勝"])
         if 式別 == "3連単":
@@ -42,7 +40,6 @@ def show_ai_prediction():
         的中率 = random.randint(70, 95)
         return 式別, 予想, 的中率
 
-    # 予想の表示
     race_urls = fetch_today_race_urls()
     top_predictions = random.sample(race_urls, 5)
 
@@ -51,4 +48,4 @@ def show_ai_prediction():
         式別, 予想, 的中率 = generate_fake_prediction()
         st.markdown(f"**{idx}. {title}｜{式別}：{予想}（的中率：{的中率}％）**")
 
-    st.caption("🔧 AIモデルによる本予想は近日中に導入予定です。")
+    st.caption("🔧 現在は仮のAI予想です。本番モデルは順次連携予定です。")
