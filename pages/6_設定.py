@@ -1,41 +1,46 @@
 import streamlit as st
+import datetime
 import json
 import os
 
-DATA_FILE = "funds_data.json"
+# ページ設定と背景色
+st.set_page_config(page_title="資金マネージャー", layout="centered")
+st.markdown("<style>body { background-color: #fff9db; }</style>", unsafe_allow_html=True)
 
-def save_funds(goal, reserve, saving):
-    data = {
-        "目標金額": goal,
-        "準備金額": reserve,
-        "積立金額": saving
-    }
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f)
-
+# 🔄 資金データの読み込み
 def load_funds():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
+    if os.path.exists("utils/funds.json"):
+        with open("utils/funds.json", "r", encoding="utf-8") as f:
             return json.load(f)
-    return {"目標金額": 0, "準備金額": 0, "積立金額": 0}
+    return {"target": 0, "reserve": 0, "savings": 0}
 
-def show_page():
-    st.markdown("### 💰 資金設定ページ")
+funds = load_funds()
 
-    current = load_funds()
+# 💰 現在の資金状況（最上部に大きく）
+st.markdown("### 💰 <b>現在の資金状況</b>", unsafe_allow_html=True)
+st.markdown(f"<h3>🎯 目標金額：<span style='color:blue;'>{funds['target']:,}円</span></h3>", unsafe_allow_html=True)
+st.markdown(f"<h3>💼 準備金額：<span style='color:green;'>{funds['reserve']:,}円</span></h3>", unsafe_allow_html=True)
+st.markdown(f"<h3>📦 積立金額：<span style='color:orange;'>{funds['savings']:,}円</span></h3>", unsafe_allow_html=True)
 
-    st.markdown("#### 🎯 現在の設定")
-    st.markdown(f"- 🎯 目標金額：**{current['目標金額']:,}円**")
-    st.markdown(f"- 💼 準備金額：**{current['準備金額']:,}円**")
-    st.markdown(f"- 📦 積立金額：**{current['積立金額']:,}円**")
+# ⏰ 現在時刻（強調表示）
+japan_time = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+st.markdown(
+    f"<div style='text-align:center; font-size:28px; font-weight:bold;'>⏰ 現在時刻：<span style='color:#007f00;'>{japan_time.strftime('%Y/%m/%d %H:%M:%S')}</span></div>",
+    unsafe_allow_html=True
+)
 
-    st.markdown("---")
-    st.markdown("#### ✍️ 新しく設定する")
+# 📂 メニュー（2列 × 3行で配置）
+st.markdown("### 📁 メニュー（表示専用）")
+col1, col2 = st.columns(2)
+with col1:
+    st.button("①AI予想", use_container_width=True)
+    st.button("③統計データ", use_container_width=True)
+    st.button("⑤競艇結果", use_container_width=True)
+with col2:
+    st.button("②勝敗入力", use_container_width=True)
+    st.button("④結果履歴", use_container_width=True)
+    st.button("⑥資金設定", use_container_width=True)
 
-    goal = st.number_input("🎯 目標金額を入力", value=current['目標金額'], step=1000)
-    reserve = st.number_input("💼 準備金額を入力", value=current['準備金額'], step=1000)
-    saving = st.number_input("📦 積立金額を入力", value=current['積立金額'], step=1000)
-
-    if st.button("✅ セットする"):
-        save_funds(goal, reserve, saving)
-        st.success("✅ 資金情報を更新しました！")
+# 📌 制作者表記
+st.markdown("---")
+st.markdown("#### 制作：小島崇彦")
