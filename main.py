@@ -1,38 +1,69 @@
 import streamlit as st
 from datetime import datetime
-import sys
-import os
 
-# ✅ calc_ecp の安全な読み込み
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils')))
-from calc_ecp import calculate_next_bet
+st.set_page_config(
+    page_title="新金丸法 × AI資金マネージャー",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# 🎯 プルダウン内容
-boat_venues = [
-    "桐生", "戸田", "江戸川", "平和島", "多摩川", "浜名湖", "蒲郡", "常滑",
-    "津", "三国", "びわこ", "住之江", "尼崎", "鳴門", "丸亀", "児島",
-    "宮島", "徳山", "下関", "若松", "芦屋", "福岡", "唐津", "大村"
-]
-bet_types = ["単勝", "複勝", "2連単", "2連複", "3連単", "3連複"]
+# ⏰ 現在時刻（日本時間）
+jst = datetime.utcnow().astimezone()
+st.markdown(f"""
+    <div style='text-align: center; font-size: 26px; font-weight: bold; color: #333; margin-top: 10px;'>
+        🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}
+    </div>
+""", unsafe_allow_html=True)
 
-# 📝 入力フォーム
-st.markdown("### ✍️ 勝敗入力")
+# 💼 タイトル + 説明
+st.markdown("""
+    <div style='text-align: center; font-size: 28px; font-weight: bold; margin-top: 20px;'>
+        💼 新金丸法 × AI資金マネージャー
+    </div>
+    <div style='text-align: center; font-size: 16px; color: #555; margin-bottom: 25px;'>
+        ページを選択してください
+    </div>
+""", unsafe_allow_html=True)
 
-with st.form("result_form"):
-    col1, col2 = st.columns(2)
-    with col1:
-        venue = st.selectbox("競艇場", boat_venues)
-        bet_type = st.selectbox("式別", bet_types)
-    with col2:
-        bet_content = st.text_input("賭け内容", placeholder="例：1-2-3")
-        win_or_lose = st.radio("結果", ["勝ち", "負け"], horizontal=True)
+# 🔘 ボタン式ページリンク
+st.markdown("""
+<style>
+.grid-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 180px);
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+.grid-buttons a {
+    display: inline-block;
+    text-align: center;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #003366;
+    background-color: #e6f0ff;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.grid-buttons a:hover {
+    background-color: #d0e4ff;
+    transform: scale(1.03);
+}
+</style>
 
-    total_funds = st.number_input("現在の残高（円）", min_value=0, value=7200)
-    step = st.number_input("ステップ数", min_value=1, value=1)
-    amount = calculate_next_bet(total_funds, step)
+<div class="grid-buttons">
+    <a href="/1_📈_AI予想">① AI予想</a>
+    <a href="/2_✍️_勝敗入力">② 勝敗入力</a>
+    <a href="/3_📊_統計データ">③ 統計データ</a>
+    <a href="/4_📋_結果履歴">④ 結果履歴</a>
+    <a href="/5_🚤_競艇結果">⑤ 競艇結果</a>
+    <a href="/6_⚙️_設定">⑥ 設定</a>
+</div>
+""", unsafe_allow_html=True)
 
-    st.markdown(f"💸 **推奨賭金：{amount}円**", unsafe_allow_html=True)
-    submitted = st.form_submit_button("保存する")
-
-if submitted:
-    st.success(f"✅ {venue}・{bet_type}・{bet_content}｜{win_or_lose}（{amount}円）を保存しました（仮）")
+# 🖊 フッター
+st.markdown("<hr>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
