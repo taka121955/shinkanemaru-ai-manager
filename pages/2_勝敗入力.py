@@ -1,43 +1,35 @@
+# pages/page2_input_result.py
+
 import streamlit as st
-from utils.calc_ecp import calculate_next_bet
 import pandas as pd
+from utils.calc_ecp import get_ecp_wave_distribution, calculate_next_bet
 
-st.markdown("## 📝 勝敗入力フォーム", unsafe_allow_html=True)
-st.markdown("🎯 <span style='font-size:22px;'>AI予想をベースに入力</span>", unsafe_allow_html=True)
+st.markdown("## 📝 勝敗入力フォーム")
 
-# ▼ 競艇場選択
-競艇場一覧 = ["若松", "住之江", "丸亀", "常滑", "蒲郡", "福岡", "平和島", "児島", "鳴門", "唐津"]
-st.markdown("📍 <span style='font-size:18px;'>競艇場</span>", unsafe_allow_html=True)
-place = st.selectbox("", 競艇場一覧, key="place")
+# ✅ ① ページ①のAI予想から番号で連動
+ai_predictions = st.session_state.get("ai_predictions", [])
+maru_numbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩']
 
-# ▼ 式別選択
-式別一覧 = ["単勝", "2連単", "3連単"]
-st.markdown("📘 <span style='font-size:18px;'>式別</span>", unsafe_allow_html=True)
-bet_type = st.selectbox("", 式別一覧, key="bet_type")
+selected_number = st.selectbox("🎯 登録する予想番号（①〜⑩）", maru_numbers)
 
-# ▼ 投票内容
-st.markdown("📝 <span style='font-size:18px;'>投票内容（例：1-3-4）</span>", unsafe_allow_html=True)
-content = st.text_input("", key="content")
+# 初期値
+selected_prediction = ai_predictions[maru_numbers.index(selected_number)] if ai_predictions else {
+    "競艇場": "", "式別": "", "投票内容": "", "的中率": "0%"}
 
-# ▼ 現在の残高・積立金（仮にここでは固定値）
-initial_fund = 10000  # 初期資金
+# 競艇場・式別・投票内容自動反映（入力不可）
+st.markdown(f"🚩 競艇場： `{selected_prediction['競艇場']}`")
+st.markdown(f"📘 式別： `{selected_prediction['式別']}`")
+st.markdown(f"✏️ 投票内容： `{selected_prediction['投票内容']}`")
+
+# ✅ ② ECP方式：賭け金計算（履歴仮：なし）
+initial_fund = 10000
 reserve_fund = 0
+bet_amount, wave, step, reserve = calculate_next_bet([], initial_fund, reserve_fund)
+st.markdown(f"💰 自動賭け金（ECP方式） ： **{bet_amount}円**")
 
-# ▼ ベット金額の自動計算（ECP方式）
-records = []  # 実際はCSVから読み込み（後で修正可能）
-bet_amount, wave, step, reserve_fund = calculate_next_bet(records, initial_fund, reserve_fund)
+# ✅ ③ 的中 or 不的中
+result = st.radio("🎯 結果は？", ["的中", "不的中"], horizontal=True)
 
-if bet_amount is None:
-    st.markdown("<span style='color:red; font-size:20px;'>⚠️ 資金不足のためリセットが必要です。</span>", unsafe_allow_html=True)
-else:
-    st.markdown(f"💰 <span style='font-size:18px;'>自動賭け金（ECP方式）</span> ： <span style='color:green; font-size:20px;'>{bet_amount}円</span>", unsafe_allow_html=True)
-    st.caption("← この金額で登録されます")
-
-# ▼ 的中・不的中の選択
-st.markdown("🎯 <span style='font-size:18px;'>結果は？</span>", unsafe_allow_html=True)
-hit = st.radio("", ["的中", "不的中"], horizontal=True, key="hit")
-
-# ▼ 登録ボタン
+# ✅ ④ 登録ボタン
 if st.button("✅ 登録する"):
-    st.success("登録完了！")
-    # → 登録処理を書く（CSV保存など）
+    st.success(f"{selected_prediction['競艇場']}の予想（{selected_prediction['投票内容']}）を登録しました。")
