@@ -1,26 +1,19 @@
 import streamlit as st
-from datetime import datetime
+import datetime
+import os
+import json
 
 # ページ設定
 st.set_page_config(page_title="資金マネージャー", layout="centered")
+st.markdown("<style>body { background-color: #fff9db; }</style>", unsafe_allow_html=True)
 
-# 背景色
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #fff9db;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# ⏰ 現在時刻の表示（日本時間）
+japan_time = datetime.datetime.utcnow() + datetime.timedelta(hours=9)
+st.markdown(f"<h5>⏰ 現在時刻：<span style='color:green;'>{japan_time.strftime('%Y/%m/%d %H:%M:%S')}</span></h5>", unsafe_allow_html=True)
 
-# 日本時間表示（大きく）
-japan_time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-st.markdown(f"<h4 style='color:#333333;'>⏰ 現在時刻：<code style='font-size:18px;'>{japan_time}</code></h4>", unsafe_allow_html=True)
-
-# メニュータイトル
+# 📁 メニュー表示
 st.markdown("### 🗂️ メニュー（表示専用）")
 
-# 2列×3行のメニュー
 col1, col2 = st.columns(2)
 with col1:
     st.button("①AI予想", use_container_width=True)
@@ -31,14 +24,22 @@ with col2:
     st.button("④結果履歴", use_container_width=True)
     st.button("⑥資金設定", use_container_width=True)
 
-# ページ⑥のデータ（セッション連携）
-target_amount = st.session_state.get("target_amount", 0)
-reserve_amount = st.session_state.get("reserve_amount", 0)
-accumulated_amount = st.session_state.get("accumulated_amount", 0)
+# 📂 JSON保存ファイルから資金情報を読み込む
+def load_funds():
+    if os.path.exists("utils/funds.json"):
+        with open("utils/funds.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"target": 0, "reserve": 0, "savings": 0}
 
-# 資金状況表示
+funds = load_funds()
+
+# 💰 現在の資金状況
 st.markdown("---")
 st.markdown("### 💰 現在の資金状況")
-st.markdown(f"🎯 **目標金額：** <span style='color:blue;'>{target_amount:,}円</span>", unsafe_allow_html=True)
-st.markdown(f"💼 **準備金額：** <span style='color:green;'>{reserve_amount:,}円</span>", unsafe_allow_html=True)
-st.markdown(f"📦 **積立金額：** <span style='color:orange;'>{accumulated_amount:,}円</span>", unsafe_allow_html=True)
+st.markdown(f"🎯 <b>目標金額：</b> <span style='color:blue;'>{funds['target']:,}円</span>", unsafe_allow_html=True)
+st.markdown(f"💼 <b>準備金額：</b> <span style='color:green;'>{funds['reserve']:,}円</span>", unsafe_allow_html=True)
+st.markdown(f"📦 <b>積立金額：</b> <span style='color:orange;'>{funds['savings']:,}円</span>", unsafe_allow_html=True)
+
+# 制作者
+st.markdown("---")
+st.markdown("#### 制作：小島崇彦")
