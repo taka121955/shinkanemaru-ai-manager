@@ -16,25 +16,28 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ✅ セッションでページを記録
+# ✅ セッションでページ記憶
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# ✅ ボタンを 2列×2段で中央揃えに配置（styleも含めて綺麗に）
-st.markdown("<div style='display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;'>", unsafe_allow_html=True)
+# ✅ 2列×2段でボタン配置（確実に横並び）
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("①AI予想"):
+        st.session_state.page = "①AI予想"
+with col2:
+    if st.button("②勝敗入力"):
+        st.session_state.page = "②勝敗入力"
 
-if st.button("①AI予想", key="b1"):
-    st.session_state.page = "①AI予想"
-if st.button("②勝敗入力", key="b2"):
-    st.session_state.page = "②勝敗入力"
-if st.button("③統計データ", key="b3"):
-    st.session_state.page = "③統計データ"
-if st.button("④結果履歴", key="b4"):
-    st.session_state.page = "④結果履歴"
+col3, col4 = st.columns(2)
+with col3:
+    if st.button("③統計データ"):
+        st.session_state.page = "③統計データ"
+with col4:
+    if st.button("④結果履歴"):
+        st.session_state.page = "④結果履歴"
 
-st.markdown("</div><br>", unsafe_allow_html=True)
-
-# ✅ ページ切替処理
+# ✅ ページ切り替え
 if st.session_state.page == "①AI予想":
     show_page1()
 elif st.session_state.page == "②勝敗入力":
@@ -44,6 +47,6 @@ elif st.session_state.page == "③統計データ":
 elif st.session_state.page == "④結果履歴":
     show_page4()
 
-# ✅ フッター（中央寄せ）
+# ✅ フッター中央表示
 st.markdown("---")
 st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
