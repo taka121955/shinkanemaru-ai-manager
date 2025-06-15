@@ -1,18 +1,18 @@
 import streamlit as st
 from datetime import datetime
 
-# ✅ ページ設定（サイドバー非表示）
+# ページ設定
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ✅ 現在時刻表示
+# 現在時刻
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
-# ✅ 金額表示
+# 金額表示
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
@@ -21,29 +21,33 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ 横並び固定ボタン（HTML使用・スマホ対応）
+# ✅ 改良デザイン：ボタンUI（見やすさ重視）
 st.markdown("""
 <style>
 .button-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 14px;
+    margin-top: 20px;
 }
 .button-container form {
     margin: 0;
 }
 .button-container button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    background-color: #f0f0f0;
-    border-radius: 6px;
+    padding: 14px 26px;
+    font-size: 17px;
+    font-weight: bold;
+    border: 2px solid #4a90e2;
+    background-color: #e6f0ff;
+    border-radius: 8px;
+    color: #003366;
     cursor: pointer;
+    transition: 0.3s;
 }
 .button-container button:hover {
-    background-color: #d0e0ff;
+    background-color: #d0e4ff;
+    transform: scale(1.03);
 }
 </style>
 
@@ -57,7 +61,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ ページ表示なし（非表示）
-# ✅ フッター
+# フッター
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
