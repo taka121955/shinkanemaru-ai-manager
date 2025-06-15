@@ -1,19 +1,15 @@
-# main.py
-
 import streamlit as st
 from datetime import datetime
 
-# ✅ ページ設定（サイドバー完全非表示）
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ✅ サイドバー非表示用CSS（強制的に隠す）
+# ✅ サイドバー完全非表示（CSS）
 st.markdown("""
 <style>
-/* サイドバーを完全に非表示 */
 .css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
     display: none !important;
 }
@@ -33,7 +29,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ 美しいボタンナビゲーション（2段 × 3列）
+# ✅ 安定レイアウト（3列 × 2段 グリッド調整済）
 st.markdown("""
 <style>
 .button-grid {
@@ -45,13 +41,13 @@ st.markdown("""
     margin-bottom: 30px;
 }
 .button-grid a {
-    display: inline-block;
+    display: block;
     text-align: center;
-    padding: 18px 0;
-    font-size: 17px;
+    padding: 16px 0;
+    font-size: 16px;
     font-weight: bold;
-    color: #003366;
     background-color: #e6f0ff;
+    color: #003366;
     border: 2px solid #4a90e2;
     border-radius: 8px;
     text-decoration: none;
