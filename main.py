@@ -10,52 +10,51 @@ st.set_page_config(
 # ✅ サイドバー完全非表示
 st.markdown("""
 <style>
-/* サイドバー非表示 */
+/* サイドバー強制非表示 */
 .css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
     display: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ 時刻表示（JST）
+# ✅ 現在時刻（JST）
 jst = datetime.utcnow().astimezone()
-st.markdown(f"<h4 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h4>", unsafe_allow_html=True)
+st.markdown(f"<h5 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h5>", unsafe_allow_html=True)
 
-# ✅ 資金情報
+# ✅ 資金情報（フォント縮小）
 st.markdown("""
-<div style='text-align: center; font-size: 15px;'>
+<div style='text-align: center; font-size: 14px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積資金：7200円
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("---")
+st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
 
-# ✅ 軽量＆スマートなボタンナビゲーション
+# ✅ 最もスリムなボタン構成（3列 × 2段）
 st.markdown("""
 <style>
 .button-grid {
     display: grid;
-    grid-template-columns: repeat(3, 140px);  /* 3列 */
-    gap: 12px;
+    grid-template-columns: repeat(3, 130px);
+    gap: 10px;
     justify-content: center;
-    margin: 20px 0 30px;
+    margin: 10px 0 20px;
 }
 .button-grid a {
     display: block;
-    padding: 8px 0;
+    padding: 7px 0;
     font-size: 13px;
     font-weight: bold;
     text-align: center;
-    background-color: #eaf3ff;
+    background-color: #f2f8ff;
     color: #003366;
     border: 1px solid #4a90e2;
     border-radius: 6px;
     text-decoration: none;
-    transition: 0.15s ease;
+    transition: 0.1s ease-in-out;
 }
 .button-grid a:hover {
-    background-color: #d6e9ff;
-    transform: scale(1.02);
+    background-color: #e1efff;
 }
 </style>
 
@@ -69,6 +68,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ フッター
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("<div style='text-align: center; font-size: 13px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
+# ✅ フッター（小さめ）
+st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; font-size: 12px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
