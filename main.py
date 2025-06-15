@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-from pages.page1_ai_prediction import show_ai_prediction
+from pages.page1_ai_prediction import show_ai_prediction  # ← ページ①の中身
 
 # ページ設定
 st.set_page_config(
@@ -9,17 +9,19 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 時刻・資金表示
+# 上部：現在時刻と資金情報
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
+
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
 </div>
 """, unsafe_allow_html=True)
+
 st.markdown("---")
 
-# ✅ ボタン（2段×3列）
+# ✅ 横並び6ボタン（2段×3列）でページ遷移対応
 st.markdown("""
 <style>
 .button-container {
@@ -60,11 +62,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ 最新APIでクエリ取得
+# ✅ 正式API：クエリ取得
 params = st.query_params
-page = params.get("page", ["0"])[0]
+page = params.get("page", ["0"])[0]  # デフォルト "0"
 
-# ページ表示
+# ✅ ページ切替
 if page == "1":
     show_ai_prediction()
 elif page == "2":
@@ -78,6 +80,6 @@ elif page == "5":
 elif page == "6":
     st.markdown("⑥ 設定ページ（準備中）")
 
-# フッター
+# ✅ フッター
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
