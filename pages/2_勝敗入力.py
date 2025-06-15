@@ -1,36 +1,67 @@
 import streamlit as st
+import pandas as pd
+import os
 from datetime import datetime
-from utils.calc_ecp import calculate_bet_amount  # 自動賭金関数（修正済み）
+from utils.calc_ecp import calculate_next_bet
 
-# タイトル
-st.markdown("### ✍️ 勝敗入力フォーム")
-st.markdown("🎯 **AI予想をベースに入力**")
+# ファイルパス設定
+RESULT_CSV = "results.csv"
 
-# 現在時刻表示（参考用）
-now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-st.markdown(f"🕒 現在時刻： `{now}`")
+# 日本時間表示
+jst = datetime.utcnow().astimezone()
+st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
-# ▼ AI予想を取得（ページ①で保存された内容）
-jcd_name = st.session_state.get("jcd_name", "")
-shikibetsu = st.session_state.get("shikibetsu", "")
-yosou = st.session_state.get("yosou", "")
+st.markdown("<h2>✍️ 勝敗入力フォーム</h2>", unsafe_allow_html=True)
+st.markdown("🎯<b>AI予想をベースに入力</b>", unsafe_allow_html=True)
 
-# ▼ プルダウン
-col1, col2 = st.columns(2)
-with col1:
-    jcd_selected = st.selectbox("競艇場", options=[
-        "住之江", "丸亀", "唐津", "平和島", "若松", "徳山", "常滑", "蒲郡", "福岡", "児島"
-    ], index=0 if jcd_name == "" else -1)
-with col2:
-    shikibetsu_selected = st.selectbox("式別", options=["単勝", "2連単", "3連単"], index=0 if shikibetsu == "" else -1)
+# 初期値の取得
+if not os.path.exists(RESULT_CSV):
+    df = pd.DataFrame(columns=["日時", "競艇場", "式別", "反省内容", "賭け金", "的中", "波", "段階", "積立金"])
+    df.to_csv(RESULT_CSV, index=False)
+else:
+    df = pd.read_csv(RESULT_CSV)
 
-# ▼ 賭け内容
-input_yosou = st.text_input("反省内容（例：1-3-4）", value=yosou if yosou else "")
+# 残高・積立金の計算
+initial_fund = 10000
+total_bet = df["賭け金"].sum() if not df.empty else 0
+reserve_fund = df["積立金"].iloc[-1] if not df.empty else 0
+current_fund = initial_fund - total_bet + reserve_fund
 
-# ▼ ECP賭金自動反映
-bet_amount = calculate_bet_amount(strategy="ecp", previous_results=[])
-st.markdown(f"💰 自動ハイハイ金（ECP方式）： `{bet_amount}` 円")
+# 競艇場と式別の選択
+places = ["住之江", "丸亀", "常滑", "児島", "福岡", "蒲郡", "大村", "若松", "平和島", "芦屋"]
+styles = ["単勝", "複勝", "2連単", "2連複", "3連単", "3連複"]
 
-# ▼ 登録ボタン
-if st.button("✅ 登録する"):
-    st.success(f"✅ 登録しました！\n\n- 競艇場：{jcd_selected}\n- 式別：{shikibetsu_selected}\n- 賭け：{input_yosou}\n- 金額：{bet_amount}円")
+place = st.selectbox("競艇場", places)
+style = st.selectbox("式別", styles)
+content = st.text_input("反省内容（例：1-3-4）")
+
+# ECP方式で次回賭け金を自動取得
+records = df.to_dict("records")
+bet, wave, step, new_reserve = calculate_next_bet(records, current_fund, reserve_fund)
+
+if bet is None:
+    st.error("💥 資金不足です。リセットしてください。")
+    if st.button("🔁 リセット"):
+        df = pd.DataFrame(columns=["日時", "競艇場", "式別", "反省内容", "賭け金", "的中", "波", "段階", "積立金"])
+        df.to_csv(RESULT_CSV, index=False)
+        st.success("🔄 リセット完了しました。初期状態に戻ります。")
+else:
+    st.markdown(f"<p>💰 自動ハイハイ金（ECP方式）： <strong>{bet}円</strong></p>", unsafe_allow_html=True)
+    if st.button("✅ 登録する"):
+        new_data = {
+            "日時": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "競艇場": place,
+            "式別": style,
+            "反省内容": content,
+            "賭け金": bet,
+            "的中": False,
+            "波": wave,
+            "段階": step,
+            "積立金": new_reserve
+        }
+        df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
+        df.to_csv(RESULT_CSV, index=False)
+        st.success("✅ 勝敗データを登録しました！")
+
+# デバッグ表示（必要であればON）
+# st.dataframe(df.tail(5))
