@@ -1,14 +1,19 @@
 import streamlit as st
 from datetime import datetime
-from pages.page1_ai_prediction import show_ai_prediction  # ← ①をインポート
+from pages.page1_ai_prediction import show_ai_prediction  # ← ①の中身をインポート
 
+# ✅ ページ設定
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ✅ 時刻と資金表示
+# ✅ session_state初期化
+if "page" not in st.session_state:
+    st.session_state.page = 0  # 0: 何も表示しない
+
+# ✅ ヘッダー（時刻＋資金表示）
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
@@ -20,51 +25,31 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ ボタンデザイン（横並び・統一スタイル）
-st.markdown("""
-<style>
-.button-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 14px;
-    margin-top: 20px;
-}
-.button-container form {
-    margin: 0;
-}
-.button-container button {
-    width: 150px;
-    height: 60px;
-    padding: 10px;
-    font-size: 17px;
-    font-weight: bold;
-    border: 2px solid #4a90e2;
-    background-color: #e6f0ff;
-    border-radius: 8px;
-    color: #003366;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.button-container button:hover {
-    background-color: #d0e4ff;
-    transform: scale(1.03);
-}
-</style>
+# ✅ ボタンデザイン（HTMLではなくStreamlitのボタンで session_state 切替）
+col1, col2, col3 = st.columns(3)
+with col1:
+    if st.button("①AI予想"):
+        st.session_state.page = 1
+with col2:
+    if st.button("②勝敗入力"):
+        st.session_state.page = 2
+with col3:
+    if st.button("③統計データ"):
+        st.session_state.page = 3
 
-<div class="button-container">
-    <form action="?page=1"><button type="submit">①AI予想</button></form>
-    <form><button disabled>②勝敗入力</button></form>
-    <form><button disabled>③統計データ</button></form>
-    <form><button disabled>④結果履歴</button></form>
-    <form><button disabled>⑤競艇結果</button></form>
-    <form><button disabled>⑥設定</button></form>
-</div>
-""", unsafe_allow_html=True)
+col4, col5, col6 = st.columns(3)
+with col4:
+    if st.button("④結果履歴"):
+        st.session_state.page = 4
+with col5:
+    if st.button("⑤競艇結果"):
+        st.session_state.page = 5
+with col6:
+    if st.button("⑥設定"):
+        st.session_state.page = 6
 
-# ✅ ①ページ内容表示（クエリで判断）
-page = st.query_params.get("page", "0")
-if page == "1":
+# ✅ ページ切替処理（①だけ中身表示）
+if st.session_state.page == 1:
     show_ai_prediction()
 
 # ✅ フッター
