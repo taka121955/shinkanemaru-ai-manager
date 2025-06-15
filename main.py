@@ -8,18 +8,18 @@ from pages.page4_record_result import show_page as show_page4
 from pages.page5_boat_results import show_page as show_page5
 from pages.page6_settings import show_page as show_page6
 
-# ✅ ページ設定
+# ✅ サイドバー非表示＆中央レイアウト
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
-    layout="centered",
+    layout="wide",  # ← wide に変更
     initial_sidebar_state="collapsed"
 )
 
-# ✅ 日本時間
+# ✅ 現在時刻
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
-# ✅ 資金表示
+# ✅ 資金状況表示
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
@@ -28,45 +28,36 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ 横並び：3列 × 2段（ボタン配置）
-row1 = st.columns(3)
-row2 = st.columns(3)
+# ✅ 横並びボタン 2段3列（スマホ横幅対応）
+# ボタンはHTML + st.markdown + unsafe_allow_htmlで制御
 
-with row1[0]:
-    if st.button("①AI予想"):
-        st.session_state["page"] = 1
-with row1[1]:
-    if st.button("②勝敗入力"):
-        st.session_state["page"] = 2
-with row1[2]:
-    if st.button("③統計データ"):
-        st.session_state["page"] = 3
+st.markdown("""
+<div style="text-align:center;">
+    <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+        <form action="?page=1"><button>①AI予想</button></form>
+        <form action="?page=2"><button>②勝敗入力</button></form>
+        <form action="?page=3"><button>③統計データ</button></form>
+        <form action="?page=4"><button>④結果履歴</button></form>
+        <form action="?page=5"><button>⑤競艇結果</button></form>
+        <form action="?page=6"><button>⑥設定</button></form>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-with row2[0]:
-    if st.button("④結果履歴"):
-        st.session_state["page"] = 4
-with row2[1]:
-    if st.button("⑤競艇結果"):
-        st.session_state["page"] = 5
-with row2[2]:
-    if st.button("⑥設定"):
-        st.session_state["page"] = 6
+# ✅ ページ切り替え制御
+page = st.query_params.get("page", "1")
 
-# ✅ ページ表示
-if "page" not in st.session_state:
-    st.session_state["page"] = 1
-
-if st.session_state["page"] == 1:
+if page == "1":
     show_page1()
-elif st.session_state["page"] == 2:
+elif page == "2":
     show_page2()
-elif st.session_state["page"] == 3:
+elif page == "3":
     show_page3()
-elif st.session_state["page"] == 4:
+elif page == "4":
     show_page4()
-elif st.session_state["page"] == 5:
+elif page == "5":
     show_page5()
-elif st.session_state["page"] == 6:
+elif page == "6":
     show_page6()
 
 # ✅ フッター
