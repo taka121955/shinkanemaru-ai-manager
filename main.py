@@ -3,18 +3,28 @@
 import streamlit as st
 from datetime import datetime
 
-# ✅ ページ設定：サイドバー非表示・横長・高速化
+# ✅ ページ設定（サイドバー完全非表示）
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ✅ 現在時刻（JST）
+# ✅ サイドバー非表示用CSS（強制的に隠す）
+st.markdown("""
+<style>
+/* サイドバーを完全に非表示 */
+.css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
+    display: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ✅ 現在時刻（日本時間）
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
-# ✅ 資金表示
+# ✅ 資金情報
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積資金：7200円
@@ -23,20 +33,22 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ ページナビゲーションボタン（2段 × 3列、軽量化済み）
+# ✅ 美しいボタンナビゲーション（2段 × 3列）
 st.markdown("""
 <style>
-.button-container {
-    display: flex;
-    flex-wrap: wrap;
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 180px);
+    gap: 18px;
     justify-content: center;
-    gap: 12px;
+    margin-top: 30px;
     margin-bottom: 30px;
 }
-.button-container a {
+.button-grid a {
     display: inline-block;
-    padding: 14px 28px;
-    font-size: 16px;
+    text-align: center;
+    padding: 18px 0;
+    font-size: 17px;
     font-weight: bold;
     color: #003366;
     background-color: #e6f0ff;
@@ -45,13 +57,13 @@ st.markdown("""
     text-decoration: none;
     transition: all 0.2s;
 }
-.button-container a:hover {
+.button-grid a:hover {
     background-color: #d0e4ff;
     transform: scale(1.05);
 }
 </style>
 
-<div class="button-container">
+<div class="button-grid">
     <a href="/?page=1_📈_AI予想">① AI予想</a>
     <a href="/?page=2_✍️_勝敗入力">② 勝敗入力</a>
     <a href="/?page=3_📊_統計データ">③ 統計データ</a>
