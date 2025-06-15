@@ -1,4 +1,3 @@
-# 📄 pages/page6_funds_setting.py
 import streamlit as st
 import json
 import os
