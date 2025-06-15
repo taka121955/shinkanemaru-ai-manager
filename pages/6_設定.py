@@ -1,18 +1,20 @@
-# pages/page6_funds_setting.py
-
 import streamlit as st
 
-st.markdown("## 💰 各種資金の設定")
+st.title("⑥ 設定ページ（積立・準備金など）")
 
-st.markdown("### 🎯 目標金額")
-goal_amount = st.number_input("目標金額を入力してください（円）", min_value=0, step=100, format="%d")
+# 初期化（1回目だけ）
+st.session_state.setdefault("目標金額", 0)
+st.session_state.setdefault("準備金額", 0)
+st.session_state.setdefault("積立金額", 0)
 
-st.markdown("### 🪙 準備金額（初期資金）")
-initial_fund = st.number_input("準備金額を入力してください（円）", min_value=0, step=100, format="%d")
+# 表示＆入力
+st.session_state["目標金額"] = st.number_input("🎯 目標金額", step=1000, value=st.session_state["目標金額"])
+st.session_state["準備金額"] = st.number_input("💰 準備金額", step=1000, value=st.session_state["準備金額"])
+st.session_state["積立金額"] = st.number_input("📦 積立金額", step=1000, value=st.session_state["積立金額"])
 
-st.markdown("### 📦 積立金額（AIによる繰越資金）")
-reserve_fund = st.number_input("積立金額を入力してください（円）", min_value=0, step=100, format="%d")
-
-if st.button("✅ 登録"):
-    st.success(f"✅ 登録完了：目標 {goal_amount:,}円｜準備金 {initial_fund:,}円｜積立金 {reserve_fund:,}円")
-    # 今後セッション保持 or CSV保存処理を追加可能
+# リセット機能（クリア用）
+if st.button("🔁 リセット（全て0円に戻す）", type="primary"):
+    st.session_state["目標金額"] = 0
+    st.session_state["準備金額"] = 0
+    st.session_state["積立金額"] = 0
+    st.error("🔴 金額をリセットしました（保存はされません）")
