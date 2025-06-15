@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# ダミーデータ（今後AIと連携予定）
+# AI予想（仮）データ：上位10件（丸数字表示）
 ai_predictions = [
     {"競艇場": "唐津", "式別": "2連単", "投票内容": "1-5", "的中率": "84%"},
     {"競艇場": "若松", "式別": "3連単", "投票内容": "4-5-6", "的中率": "82%"},
@@ -18,20 +18,27 @@ ai_predictions = [
     {"競艇場": "津", "式別": "単勝", "投票内容": "2", "的中率": "73%"},
 ]
 
-# セッションに保存（②で連動用）
+# セッションに保存（②へ連携用）
 st.session_state["ai_predictions"] = ai_predictions
 
-# ヘッダー
-st.markdown("### 📈 本日のAI予想（上位10件）")
-st.markdown(f"🕐 現在時刻： `{datetime.now().strftime('%Y/%m/%d %H:%M:%S')}`")
-
-# 表形式で表示（エクセル風）
+# 丸数字のインデックス
+maru_numbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩']
 df = pd.DataFrame(ai_predictions)
-df.index = [f"{i+1}位" for i in range(len(df))]
-st.dataframe(df.style.set_table_styles(
-    [{'selector': 'th', 'props': [('font-size', '18px'), ('text-align', 'center')]},
-     {'selector': 'td', 'props': [('font-size', '16px')]}]
-), height=500, use_container_width=True)
+df.index = maru_numbers
 
-# 選択肢通知
-st.info("👉 ページ②でこの内容を選択して反映できます。")
+# タイトル
+st.markdown("### 📉 本日のAI予想（上位10件）")
+st.markdown(f"🕓 現在の時刻： `{datetime.now().strftime('%Y/%m/%d %H:%M:%S')}`")
+
+# 表スタイル（Excel風）
+st.dataframe(
+    df.style.set_table_styles([
+        {'selector': 'th', 'props': [('font-size', '18px'), ('text-align', 'center')]},
+        {'selector': 'td', 'props': [('font-size', '16px')]}
+    ]),
+    height=520,
+    use_container_width=True
+)
+
+# 案内
+st.info("👉 ページ②で、上記の①〜⑩を選択し内容を反映できます。")
