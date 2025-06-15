@@ -7,7 +7,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ✅ サイドバー強制非表示
+# ✅ サイドバー非表示
 st.markdown("""
 <style>
 .css-1lcbmhc.e1fqkh3o3, .css-164nlkn.e1fqkh3o3 {
@@ -16,23 +16,23 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ✅ 上部（時刻・資金情報）をスッキリ構成
+# ✅ 時刻・資金情報（フォント拡大）
 jst = datetime.utcnow().astimezone()
 st.markdown(f"""
 <div style='text-align: center; margin-top: 5px; margin-bottom: 3px;'>
-  <span style='font-size: 13px;'>🕒 現在時刻（日本時間）：</span><br>
-  <span style='font-size: 20px; font-weight: bold;'>{jst.strftime('%Y/%m/%d %H:%M:%S')}</span>
+  <span style='font-size: 14px;'>🕒 現在時刻（日本時間）：</span><br>
+  <span style='font-size: 22px; font-weight: bold;'>{jst.strftime('%Y/%m/%d %H:%M:%S')}</span>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div style='text-align: center; font-size: 13px; margin-bottom: 10px;'>
+<div style='text-align: center; font-size: 15px; margin-bottom: 10px;'>
 🎯 目標金額：<b>10000円</b>　💰 初期資金：<b>5000円</b>　📊 累積資金：<b>7200円</b>
 </div>
-<hr style='margin: 8px 0;'>
+<hr style='margin: 10px 0;'>
 """, unsafe_allow_html=True)
 
-# ✅ コンパクトナビボタン（3列2段・中央揃え）
+# ✅ ナビボタン（フォント少し大きく）
 st.markdown("""
 <style>
 .button-grid {
@@ -44,8 +44,8 @@ st.markdown("""
 }
 .button-grid a {
     display: block;
-    padding: 7px 0;
-    font-size: 13px;
+    padding: 8px 0;
+    font-size: 14px;
     font-weight: bold;
     text-align: center;
     background-color: #f2f8ff;
@@ -53,7 +53,7 @@ st.markdown("""
     border: 1px solid #4a90e2;
     border-radius: 6px;
     text-decoration: none;
-    transition: 0.1s ease-in-out;
+    transition: 0.15s ease-in-out;
 }
 .button-grid a:hover {
     background-color: #e1efff;
@@ -70,6 +70,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ✅ フッター（軽めに）
+# ✅ フッター
 st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
-st.markdown("<div style='text-align: center; font-size: 12px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; font-size: 13px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
