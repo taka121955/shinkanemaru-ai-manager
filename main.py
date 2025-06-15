@@ -1,53 +1,51 @@
+# main.py
+
 import streamlit as st
 from datetime import datetime
+import pandas as pd
+import os
 
-st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# 現在時刻
-jst = datetime.utcnow().astimezone()
-st.markdown(f"<h2 style='text-align: center;'>🕒 現在時刻：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h2>", unsafe_allow_html=True)
+# ページタイトル
+st.markdown("### 🕒 現在時刻 ：  \n<font size=5>{}</font>".format(
+    datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+), unsafe_allow_html=True)
 
-# タイトルと案内
-st.markdown("""
-<div style='text-align: center; font-size: 24px; font-weight: bold;'>💼 新金丸法 × AI資金マネージャー</div>
-<div style='text-align: center; font-size: 16px;'>以下のページを選択してください</div>
+st.markdown("## 💼 新金丸法 × AI資金マネージャー")
+st.markdown("以下のページを選択してください")
+
+# 金額読み込み
+if os.path.exists("settings.csv"):
+    df = pd.read_csv("settings.csv")
+    if not df.empty:
+        target = df["目標金額"].values[0]
+        reserve = df["準備金"].values[0]
+        saving = df["積立金"].values[0]
+    else:
+        target, reserve, saving = 0, 0, 0
+else:
+    target, reserve, saving = 0, 0, 0
+
+# 金額表示
+st.markdown(f"""
+### 🎯 目標金額：<span style='font-size:24px; color:green;'>{target:,}円</span>  
+### 🧰 準備金額：<span style='font-size:24px; color:blue;'>{reserve:,}円</span>  
+### 🏦 積立金額：<span style='font-size:24px; color:orange;'>{saving:,}円</span>
 """, unsafe_allow_html=True)
 
-# ボタン形式のナビゲーション
-st.markdown("""
-<style>
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 180px);
-    gap: 16px;
-    justify-content: center;
-    margin: 30px 0;
-}
-.button-grid a {
-    display: inline-block;
-    text-align: center;
-    padding: 14px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #003366;
-    background-color: #e6f0ff;
-    border: 2px solid #4a90e2;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-.button-grid a:hover {
-    background-color: #d0e4ff;
-    transform: scale(1.05);
-}
-</style>
+# ページリンクボタン
+st.markdown("---")
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.page_link("pages/page1_ai_prediction.py", label="① AI予想", icon="📊")
+    st.page_link("pages/page2_input_result.py", label="② 勝敗入力", icon="📝")
+with col2:
+    st.page_link("pages/page3_statistics.py", label="③ 統計データ", icon="📈")
+    st.page_link("pages/page4_record_result.py", label="④ 勝敗履歴", icon="📋")
+with col3:
+    st.page_link("pages/page5_boat_results.py", label="⑤ 競艇結果", icon="🚤")
+    st.page_link("pages/page6_fund_settings.py", label="⑥ 資金設定", icon="⚙️")
 
-<div class="button-grid">
-    <a href="/?page=1_📈_AI予想">① AI予想</a>
-    <a href="/?page=2_✍️_勝敗入力">② 勝敗入力</a>
-</div>
-""", unsafe_allow_html=True)
-
-# フッター
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
+# 制作者名
+st.markdown("<br><br><center>制作者：小島崇彦</center>", unsafe_allow_html=True)
