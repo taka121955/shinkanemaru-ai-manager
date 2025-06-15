@@ -5,11 +5,11 @@ from pages.page1_ai_prediction import show_page as show_page1
 from pages.page2_input_result import show_page as show_page2
 from pages.page3_statistics import show_page as show_page3
 from pages.page4_record_result import show_page as show_page4
-from pages.page5_boat_results import show_page as show_page5
+from pages.page5_boat_results import show_page as show_page5  # ←⑤ページ対応済み
 
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ✅ 日本時間表示
+# ✅ 現在の日本時間を中央に表示
 now = datetime.utcnow() + timedelta(hours=9)
 jst = now.strftime('%Y/%m/%d %H:%M:%S')
 st.markdown(
@@ -17,44 +17,47 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ✅ セッションでページ記憶
+# ✅ セッションでページを記録
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# ✅ ボタン配置（横並び2列、ラベルをボタンの下に）
-button_info = [
-    ("①AI予想", "①"),
-    ("②勝敗入力", "②"),
-    ("③統計データ", "③"),
-    ("④結果履歴", "④"),
-    ("⑤競艇結果", "⑤"),
-]
+# ✅ ボタンを2列レイアウト（縦横どちらも綺麗）
+# 1行目
+col1, col2 = st.columns(2)
+with col1:
+    if st.button("①AI予想"):
+        st.session_state.page = "①AI予想"
+with col2:
+    if st.button("②勝敗入力"):
+        st.session_state.page = "②勝敗入力"
 
-# 2列 × 複数行
-for i in range(0, len(button_info), 2):
-    cols = st.columns(2)
-    for j in range(2):
-        if i + j < len(button_info):
-            label, short = button_info[i + j]
-            with cols[j]:
-                if st.button(short, key=label):
-                    st.session_state.page = label
-                st.markdown(f"<div style='text-align:center'>{label}</div>", unsafe_allow_html=True)
+# 2行目
+col3, col4 = st.columns(2)
+with col3:
+    if st.button("③統計データ"):
+        st.session_state.page = "③統計データ"
+with col4:
+    if st.button("④結果履歴"):
+        st.session_state.page = "④結果履歴"
 
-st.markdown("<br>", unsafe_allow_html=True)
+# 3行目（中央配置の1つボタン）
+col5, col6, col7 = st.columns([1, 2, 1])
+with col6:
+    if st.button("⑤競艇結果"):
+        st.session_state.page = "⑤競艇結果"
 
-# ✅ ページ切替処理
-page_map = {
-    "①AI予想": show_page1,
-    "②勝敗入力": show_page2,
-    "③統計データ": show_page3,
-    "④結果履歴": show_page4,
-    "⑤競艇結果": show_page5,
-}
+# ✅ ページ表示処理
+if st.session_state.page == "①AI予想":
+    show_page1()
+elif st.session_state.page == "②勝敗入力":
+    show_page2()
+elif st.session_state.page == "③統計データ":
+    show_page3()
+elif st.session_state.page == "④結果履歴":
+    show_page4()
+elif st.session_state.page == "⑤競艇結果":
+    show_page5()
 
-if st.session_state.page in page_map:
-    page_map[st.session_state.page]()
-
-# ✅ フッター
+# ✅ フッター（中央寄せ）
 st.markdown("---")
 st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
