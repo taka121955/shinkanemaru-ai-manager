@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+from pages.page1_ai_prediction import show_ai_prediction  # ← ①をインポート
 
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
@@ -7,11 +8,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 現在時刻
+# ✅ 時刻と資金表示
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
 
-# 金額表示
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
@@ -20,7 +20,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# ✅ 完全統一ボタンスタイル（幅・高さ・字揃えまで統一）
+# ✅ ボタンデザイン（横並び・統一スタイル）
 st.markdown("""
 <style>
 .button-container {
@@ -53,7 +53,7 @@ st.markdown("""
 </style>
 
 <div class="button-container">
-    <form><button disabled>①AI予想</button></form>
+    <form action="?page=1"><button type="submit">①AI予想</button></form>
     <form><button disabled>②勝敗入力</button></form>
     <form><button disabled>③統計データ</button></form>
     <form><button disabled>④結果履歴</button></form>
@@ -62,6 +62,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# フッター
+# ✅ ①ページ内容表示（クエリで判断）
+page = st.query_params.get("page", "0")
+if page == "1":
+    show_ai_prediction()
+
+# ✅ フッター
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
