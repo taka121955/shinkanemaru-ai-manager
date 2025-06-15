@@ -1,31 +1,29 @@
 import streamlit as st
 from datetime import datetime
-from pages.page1_ai_prediction import show_ai_prediction  # ← ①の中身をインポート
+from pages.page1_ai_prediction import show_ai_prediction  # ← AI予想の表示関数をインポート
 
-# ✅ ページ設定
+# ページ設定
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ✅ session_state初期化
+# ページ初期化
 if "page" not in st.session_state:
-    st.session_state.page = 0  # 0: 何も表示しない
+    st.session_state.page = 0  # 初期は何も表示しない
 
-# ✅ ヘッダー（時刻＋資金表示）
+# ヘッダー：現在時刻と資金状況
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
-
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
 </div>
 """, unsafe_allow_html=True)
-
 st.markdown("---")
 
-# ✅ ボタンデザイン（HTMLではなくStreamlitのボタンで session_state 切替）
+# ボタン（横並び・整形済み）
 col1, col2, col3 = st.columns(3)
 with col1:
     if st.button("①AI予想"):
@@ -48,10 +46,10 @@ with col6:
     if st.button("⑥設定"):
         st.session_state.page = 6
 
-# ✅ ページ切替処理（①だけ中身表示）
+# ページ内容表示（①のみ有効）
 if st.session_state.page == 1:
     show_ai_prediction()
 
-# ✅ フッター
+# フッター
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
