@@ -1,43 +1,29 @@
 import streamlit as st
-from utils.calc_ecp import calculate_next_bet
-from datetime import datetime
 
-def show_page():
-    st.markdown("## 📝 勝敗入力")
+st.title("✍️ 勝敗入力フォーム")
 
-    # 現在時刻表示（参考）
-    now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    st.markdown(f"🕒 入力時刻：`{now}`")
+# 候補リスト
+競艇場リスト = ["住之江", "丸亀", "芦屋", "唐津", "蒲郡", "大村", "若松", "平和島", "戸田", "児島"]
+式別リスト = ["3連単", "2連単", "単勝"]
 
-    # 競艇場名（プルダウン）全場対応
-    jyo = st.selectbox("🚤 競艇場名を選択", [
-        "桐生", "戸田", "江戸川", "平和島", "多摩川",
-        "浜名湖", "蒲郡", "常滑", "津",
-        "三国", "びわこ", "住之江", "尼崎",
-        "鳴門", "丸亀", "児島", "宮島", "徳山",
-        "下関", "若松", "芦屋", "福岡", "唐津", "大村"
-    ])
+# セッションから読み込み（あれば）
+予想 = st.session_state.get("last_prediction", {})
 
-    # 式別（プルダウン）
-    shikibetsu = st.selectbox("📘 式別を選択", ["単勝", "2連単", "3連単"])
+st.markdown("### 🎯 AI予想をベースに入力")
 
-    # 賭け内容（簡単な入力欄）
-    bet_detail = st.text_input("🎯 賭け内容（例：1-2-3）")
+col1, col2 = st.columns(2)
 
-    # オッズ入力（仮）
-    odds = st.number_input("📈 オッズ（例：2.5）", min_value=1.0, step=0.1)
+with col1:
+    競艇場 = st.selectbox("競艇場", 競艇場リスト, index=競艇場リスト.index(予想.get("競艇場", 競艇場リスト[0])))
 
-    # 勝敗履歴（仮：まだ未実装、空リスト）
-    records = []
+with col2:
+    式別 = st.selectbox("式別", 式別リスト, index=式別リスト.index(予想.get("式別", 式別リスト[0])))
 
-    # 賭金の自動計算（ECPロジック）
-    bet_amount = calculate_next_bet(records, odds)
+賭け内容 = st.text_input("賭け内容（例：1-3-4）", value=予想.get("内容", ""))
 
-    # 表示
-    st.markdown("---")
-    st.success(f"💰 ECP方式による次回賭金額：`{int(bet_amount)}円`")
-    st.caption("※履歴が記録されると自動で増減します（現在は仮値）")
+# ECPに基づく自動賭金（ここでは仮に100円固定）
+賭金 = 100
+st.markdown(f"💰 自動賭金（ECP方式）：**{賭金}円**")
 
-    # 登録ボタン（今後CSV保存などに拡張可）
-    if st.button("✅ この内容で登録（まだ保存は未実装）"):
-        st.info("現在は表示のみです。保存機能は今後追加予定です。")
+if st.button("✅ 登録する"):
+    st.success(f"登録完了：{競艇場}｜{式別}｜{賭け内容}｜{賭金}円")
