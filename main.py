@@ -1,4 +1,6 @@
-import streamlit as st
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))import streamlit as st
 from datetime import datetime  # ← これが必要です！
 
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="wide")
