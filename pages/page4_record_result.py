@@ -1,38 +1,22 @@
+# pages/page4_record_result.py
+
 import streamlit as st
 import pandas as pd
-import os
 
-st.subheader("📋 結果履歴（全記録）")
+st.markdown("### 📄 結果履歴")
+st.write("これまでの勝敗結果・賭け金・払戻などを一覧で確認できます。")
 
-file_path = "results.csv"
-
-# ファイル存在チェック＋空チェック
-if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
-    st.warning("記録ファイルが存在しないか、空です。")
-    st.stop()
-
+# CSVから読み込み
 try:
-    df = pd.read_csv(file_path)
-except pd.errors.EmptyDataError:
-    st.warning("ファイルは存在しますが、中身が空です。")
-    st.stop()
+    df = pd.read_csv("results.csv")
 
-if df.empty:
-    st.info("まだ記録がありません。")
-    st.stop()
+    if df.empty:
+        st.info("まだ結果が記録されていません。")
+    else:
+        df["的中"] = df["的中"].replace({1: "◯", 0: "×"})
+        df["日付"] = pd.to_datetime(df["日付"]).dt.strftime("%Y/%m/%d %H:%M")
+        df = df.sort_values(by="日付", ascending=False)
 
-# データ整形
-df["払戻金"] = pd.to_numeric(df["払戻金"], errors="coerce").fillna(0)
-df["賭金"] = pd.to_numeric(df["賭金"], errors="coerce").fillna(0)
-df["利益"] = df["払戻金"] - df["賭金"]
-df["的中"] = df["払戻金"] > 0
-df = df.sort_values(by="日付", ascending=False)
-
-# 表示
-st.dataframe(df[["日付", "競艇場", "レース", "賭金", "払戻金", "利益", "的中"]], use_container_width=True)
-
-if st.button("🧹 すべての記録をクリア（注意）"):
-    df.drop(df.index, inplace=True)
-    df.to_csv(file_path, index=False)
-    st.success("すべての記録を削除しました。")
-    st.experimental_rerun()
+        st.dataframe(df, use_container_width=True)
+except FileNotFoundError:
+    st.warning("記録ファイル（results.csv）が見つかりません。")
