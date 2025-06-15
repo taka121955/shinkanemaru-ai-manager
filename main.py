@@ -9,27 +9,40 @@ from pages.page5_boat_results import show_page as show_page5
 
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ✅ 日本時間の現在時刻を表示（中央寄せ）
+# ✅ 現在の日本時間を中央に表示
 now = datetime.utcnow() + timedelta(hours=9)
 jst = now.strftime('%Y/%m/%d %H:%M:%S')
 st.markdown(
-    f"<h3 style='text-align: center;'>🕰️ 現在の時刻（日本時間）<br>{jst}</h3><hr>",
+    f"<div style='text-align:center; font-size:24px;'>🕰️ 現在の時刻（日本時間）<br>{jst}</div><br>",
     unsafe_allow_html=True
 )
 
-# ✅ ページ初期設定
+# ✅ セッションでページ記憶
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# ✅ 横一列ボタン（スマホでも横並び維持）
-button_labels = ["①AI予想", "②勝敗入力", "③統計データ", "④結果履歴", "⑤競艇結果"]
-cols = st.columns(5)
-for i, col in enumerate(cols):
-    with col:
-        if st.button(button_labels[i]):
-            st.session_state.page = button_labels[i]
+# ✅ ボタン配置（①② / ③④ / ⑤だけ中央）
+col1, col2 = st.columns([1, 1])
+with col1:
+    if st.button("①AI予想"):
+        st.session_state.page = "①AI予想"
+with col2:
+    if st.button("②勝敗入力"):
+        st.session_state.page = "②勝敗入力"
 
-st.markdown("<br>", unsafe_allow_html=True)
+col3, col4 = st.columns([1, 1])
+with col3:
+    if st.button("③統計データ"):
+        st.session_state.page = "③統計データ"
+with col4:
+    if st.button("④結果履歴"):
+        st.session_state.page = "④結果履歴"
+
+# ⑤だけ中央
+st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+if st.button("⑤競艇結果"):
+    st.session_state.page = "⑤競艇結果"
+st.markdown("</div><br>", unsafe_allow_html=True)
 
 # ✅ ページ切替処理
 if st.session_state.page == "①AI予想":
@@ -43,6 +56,6 @@ elif st.session_state.page == "④結果履歴":
 elif st.session_state.page == "⑤競艇結果":
     show_page5()
 
-# ✅ フッター
+# ✅ フッター（中央）
 st.markdown("---")
 st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
