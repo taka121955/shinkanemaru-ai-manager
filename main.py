@@ -1,55 +1,83 @@
 import streamlit as st
 from datetime import datetime
-from pages.page1_ai_prediction import show_ai_prediction  # ← AI予想の表示関数をインポート
+from pages.page1_ai_prediction import show_ai_prediction  # 必要に応じて他ページも追加
 
-# ページ設定
+# ✅ ページ設定
 st.set_page_config(
     page_title="新金丸法 × AI資金マネージャー",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# ページ初期化
-if "page" not in st.session_state:
-    st.session_state.page = 0  # 初期は何も表示しない
-
-# ヘッダー：現在時刻と資金状況
+# ✅ 時刻・資金表示
 jst = datetime.utcnow().astimezone()
 st.markdown(f"<h3 style='text-align: center;'>🕒 現在時刻（日本時間）：{jst.strftime('%Y/%m/%d %H:%M:%S')}</h3>", unsafe_allow_html=True)
+
 st.markdown("""
 <div style='text-align: center; font-size: 18px;'>
 🎯 目標金額：10000円　💰 初期資金：5000円　📊 累積立資金：7200円
 </div>
 """, unsafe_allow_html=True)
+
 st.markdown("---")
 
-# ボタン（横並び・整形済み）
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("①AI予想"):
-        st.session_state.page = 1
-with col2:
-    if st.button("②勝敗入力"):
-        st.session_state.page = 2
-with col3:
-    if st.button("③統計データ"):
-        st.session_state.page = 3
+# ✅ ボタンデザイン（2段×3列・ページ遷移形式）
+st.markdown("""
+<style>
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+.button-container form {
+    margin: 0;
+}
+.button-container button {
+    width: 150px;
+    height: 60px;
+    font-size: 17px;
+    font-weight: bold;
+    border: 2px solid #4a90e2;
+    background-color: #e6f0ff;
+    border-radius: 8px;
+    color: #003366;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.button-container button:hover {
+    background-color: #d0e4ff;
+    transform: scale(1.03);
+}
+</style>
 
-col4, col5, col6 = st.columns(3)
-with col4:
-    if st.button("④結果履歴"):
-        st.session_state.page = 4
-with col5:
-    if st.button("⑤競艇結果"):
-        st.session_state.page = 5
-with col6:
-    if st.button("⑥設定"):
-        st.session_state.page = 6
+<div class="button-container">
+    <form action='?page=1' method='get'><button>①AI予想</button></form>
+    <form action='?page=2' method='get'><button>②勝敗入力</button></form>
+    <form action='?page=3' method='get'><button>③統計データ</button></form>
+    <form action='?page=4' method='get'><button>④結果履歴</button></form>
+    <form action='?page=5' method='get'><button>⑤競艇結果</button></form>
+    <form action='?page=6' method='get'><button>⑥設定</button></form>
+</div>
+""", unsafe_allow_html=True)
 
-# ページ内容表示（①のみ有効）
-if st.session_state.page == 1:
+# ✅ URLパラメータでページ判定（遷移表示）
+page = st.query_params.get("page", "0")
+
+if page == "1":
     show_ai_prediction()
+elif page == "2":
+    st.markdown("② 勝敗入力ページ（準備中）")
+elif page == "3":
+    st.markdown("③ 統計データページ（準備中）")
+elif page == "4":
+    st.markdown("④ 結果履歴ページ（準備中）")
+elif page == "5":
+    st.markdown("⑤ 競艇結果ページ（準備中）")
+elif page == "6":
+    st.markdown("⑥ 設定ページ（準備中）")
 
-# フッター
+# ✅ フッター
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
