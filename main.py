@@ -1,4 +1,4 @@
- import streamlit as st
+import streamlit as st
 from datetime import datetime
 
 from pages.page1_ai_prediction import show_page as show_page1
