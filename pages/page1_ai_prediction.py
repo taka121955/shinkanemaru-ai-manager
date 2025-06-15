@@ -1,4 +1,3 @@
-
 import streamlit as st
 import requests
 from datetime import datetime
@@ -6,18 +5,16 @@ from bs4 import BeautifulSoup
 import random
 
 def fetch_today_race_urls():
-    """BOATRACE公式から本日の全レースURLを抽出"""
     base_url = "https://www.boatrace.jp/owpc/pc/race/racelist"
     today = datetime.now().strftime("%Y%m%d")
     race_urls = []
-    for jcd in range(1, 25):  # 全国24場
+    for jcd in range(1, 25):
         jcd_str = f"{jcd:02}"
         url = f"{base_url}?jcd={jcd_str}&hd={today}"
         race_urls.append((jcd_str, url))
     return race_urls
 
 def extract_race_info(jcd_str, url):
-    """スクレイピングで出走表タイトルなどを抽出（簡易）"""
     try:
         res = requests.get(url, timeout=10)
         soup = BeautifulSoup(res.text, "html.parser")
@@ -30,8 +27,7 @@ def extract_race_info(jcd_str, url):
         return f"競艇場 {jcd_str}（取得失敗）"
 
 def generate_fake_prediction():
-    """仮のAI予想（将来はモデル連携）"""
-   式別 = random.choice(["3連単", "2連単", "単勝"])
+    式別 = random.choice(["3連単", "2連単", "単勝"])
     if 式別 == "3連単":
         予想 = f"{random.randint(1,6)}-{random.randint(1,6)}-{random.randint(1,6)}"
     elif 式別 == "2連単":
@@ -44,7 +40,6 @@ def generate_fake_prediction():
 def show_page():
     st.title("① AI予想（本物処理準備中）")
 
-    # 現在時刻（日本時間）
     jst = datetime.utcnow().astimezone()
     st.markdown(f"🕒 現在時刻（日本時間）：**{jst.strftime('%Y/%m/%d %H:%M:%S')}**")
 
@@ -53,7 +48,6 @@ def show_page():
     race_urls = fetch_today_race_urls()
     top_predictions = []
 
-    # 上位5件を取得（仮に5競艇場ランダムで選出）
     selected_races = random.sample(race_urls, 5)
 
     for jcd_str, url in selected_races:
@@ -72,4 +66,3 @@ def show_page():
         )
 
     st.caption("※ 現在は仮予想ロジック。近日中に正式AIモデルを接続予定。")
-    
