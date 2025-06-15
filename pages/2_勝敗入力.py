@@ -7,70 +7,52 @@ from utils.calc_ecp import calculate_next_bet
 st.title("✍️ 勝敗入力フォーム")
 st.markdown("🎯 **AI予想をベースに入力**")
 
-# 競艇場・式別プルダウン
-stadiums = ["住之江", "丸亀", "蒲郡", "常滑", "福岡", "若松", "平和島"]
-formulas = ["単勝", "2連単", "3連単"]
-
-# 初期資金・積立金セッション
-if "initial_fund" not in st.session_state:
-    st.session_state.initial_fund = 10000
-if "reserve_fund" not in st.session_state:
-    st.session_state.reserve_fund = 0
-
-# 過去データ読み込み
+# CSVファイル
 csv_path = "results.csv"
-if os.path.exists(csv_path):
+
+# デフォルト資金と積立
+initial_fund = st.sidebar.number_input("💰 現在残高", min_value=0, value=5000, step=100)
+reserve_fund = st.sidebar.number_input("📦 積立金", min_value=0, value=0, step=100)
+
+# データ読み込み（空対策）
+if os.path.exists(csv_path) and os.path.getsize(csv_path) > 0:
     df = pd.read_csv(csv_path)
     history = df.to_dict(orient="records")
 else:
     df = pd.DataFrame(columns=["日付", "競艇場", "式別", "反省内容", "賭け金", "的中", "波", "ステップ"])
     history = []
 
-# 次の賭け金算出
-bet, wave, step, updated_reserve = calculate_next_bet(
-    history,
-    initial_fund=st.session_state.initial_fund,
-    reserve_fund=st.session_state.reserve_fund
-)
+# 競艇場・式別
+race_name = st.selectbox("競艇場", ["住之江", "丸亀", "常滑", "福岡", "平和島", "若松", "児島", "芦屋", "蒲郡"])
+bet_type = st.selectbox("式別", ["単勝", "複勝", "2連単", "3連単"])
+
+# ECP方式でベット金額を計算
+bet, wave, step, updated_reserve = calculate_next_bet(history, initial_fund, reserve_fund)
 
 if bet is None:
-    st.error("❌ 資金が不足しています。リセットが必要です。")
-    if st.button("🔁 リセット"):
-        st.session_state.initial_fund = 10000
-        st.session_state.reserve_fund = 0
-        st.success("✅ 初期状態にリセットしました")
+    st.error("⚠️ 資金不足のためリセットが必要です。")
+    st.warning("🔁 残高・積立金を初期状態に戻します。")
     st.stop()
 
-# 入力フォーム
-with st.form("form"):
-    col1, col2 = st.columns(2)
-    stadium = col1.selectbox("競艇場", stadiums)
-    formula = col2.selectbox("式別", formulas)
+# 入力欄
+prediction = st.text_input("反省内容（例：1-3-4）")
+st.markdown(f"💵 自動ハイハイ金（ECP方式）：　**{bet}円**")
 
-    reflection = st.text_input("反省内容（例：1-3-4）")
-    is_hit = st.checkbox("🎯 的中した")
-    st.markdown(f"💰 **自動賭金（ECP）：{bet}円**")
+# 的中チェック
+hit = st.checkbox("🎯 的中した")
 
-    submitted = st.form_submit_button("✅ 登録する")
-    if submitted:
-        new_row = {
-            "日付": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "競艇場": stadium,
-            "式別": formula,
-            "反省内容": reflection,
-            "賭け金": bet,
-            "的中": is_hit,
-            "波": wave,
-            "ステップ": step
-        }
-
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-        df.to_csv(csv_path, index=False)
-
-        # 資金更新
-        if is_hit:
-            st.session_state.reserve_fund += bet
-        else:
-            st.session_state.initial_fund -= bet
-
-        st.success("✅ 勝敗記録を登録しました。")
+# 登録ボタン
+if st.button("✅ 登録する"):
+    new_data = {
+        "日付": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "競艇場": race_name,
+        "式別": bet_type,
+        "反省内容": prediction,
+        "賭け金": bet,
+        "的中": hit,
+        "波": wave,
+        "ステップ": step,
+    }
+    df = df.append(new_data, ignore_index=True)
+    df.to_csv(csv_path, index=False)
+    st.success("📥 勝敗記録を登録しました！")
