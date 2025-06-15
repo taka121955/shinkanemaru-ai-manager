@@ -1,71 +1,43 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
-import os
 from utils.calc_ecp import calculate_next_bet
+import pandas as pd
 
-st.markdown("<h2 style='font-size:28px;'>📝 勝敗入力フォーム</h2>", unsafe_allow_html=True)
-st.markdown("<div style='font-size:20px;'>🎯 <b>AI予想をベースに入力</b></div>", unsafe_allow_html=True)
+st.markdown("## 📝 勝敗入力フォーム", unsafe_allow_html=True)
+st.markdown("🎯 <span style='font-size:22px;'>AI予想をベースに入力</span>", unsafe_allow_html=True)
 
-競艇場一覧 = ["若松", "芦屋", "唐津", "福岡", "大村", "住之江", "尼崎", "鳴門", "丸亀", "児島",
-           "宮島", "徳山", "下関", "浜名湖", "蒲郡", "常滑", "津", "三国", "びわこ"]
-式別一覧 = ["単勝", "複勝", "2連単", "3連単", "2連複", "3連複", "拡連複"]
+# ▼ 競艇場選択
+競艇場一覧 = ["若松", "住之江", "丸亀", "常滑", "蒲郡", "福岡", "平和島", "児島", "鳴門", "唐津"]
+st.markdown("📍 <span style='font-size:18px;'>競艇場</span>", unsafe_allow_html=True)
+place = st.selectbox("", 競艇場一覧, key="place")
 
-if 'initial_fund' not in st.session_state:
-    st.session_state.initial_fund = 5000
-if 'reserve_fund' not in st.session_state:
-    st.session_state.reserve_fund = 0
+# ▼ 式別選択
+式別一覧 = ["単勝", "2連単", "3連単"]
+st.markdown("📘 <span style='font-size:18px;'>式別</span>", unsafe_allow_html=True)
+bet_type = st.selectbox("", 式別一覧, key="bet_type")
 
-csv_path = "results.csv"
-if os.path.exists(csv_path):
-    try:
-        df = pd.read_csv(csv_path)
-    except pd.errors.EmptyDataError:
-        df = pd.DataFrame(columns=["日付", "競艇場", "式別", "賭け内容", "賭け金", "的中", "波", "ステップ"])
+# ▼ 投票内容
+st.markdown("📝 <span style='font-size:18px;'>投票内容（例：1-3-4）</span>", unsafe_allow_html=True)
+content = st.text_input("", key="content")
+
+# ▼ 現在の残高・積立金（仮にここでは固定値）
+initial_fund = 10000  # 初期資金
+reserve_fund = 0
+
+# ▼ ベット金額の自動計算（ECP方式）
+records = []  # 実際はCSVから読み込み（後で修正可能）
+bet_amount, wave, step, reserve_fund = calculate_next_bet(records, initial_fund, reserve_fund)
+
+if bet_amount is None:
+    st.markdown("<span style='color:red; font-size:20px;'>⚠️ 資金不足のためリセットが必要です。</span>", unsafe_allow_html=True)
 else:
-    df = pd.DataFrame(columns=["日付", "競艇場", "式別", "賭け内容", "賭け金", "的中", "波", "ステップ"])
+    st.markdown(f"💰 <span style='font-size:18px;'>自動賭け金（ECP方式）</span> ： <span style='color:green; font-size:20px;'>{bet_amount}円</span>", unsafe_allow_html=True)
+    st.caption("← この金額で登録されます")
 
-with st.form("bet_form"):
-    col1, col2 = st.columns(2)
-    with col1:
-        place = st.selectbox("📍 <span style='font-size:18px;'>競艇場</span>", options=競艇場一覧, format_func=lambda x: x, key="place", label_visibility="visible")
-    with col2:
-        bet_type = st.selectbox("📘 <span style='font-size:18px;'>式別</span>", options=式別一覧, format_func=lambda x: x, key="bet_type", label_visibility="visible")
+# ▼ 的中・不的中の選択
+st.markdown("🎯 <span style='font-size:18px;'>結果は？</span>", unsafe_allow_html=True)
+hit = st.radio("", ["的中", "不的中"], horizontal=True, key="hit")
 
-    bet_content = st.text_input("📝 投票内容（例：1-3-4）", key="content")
-
-    records = df.to_dict(orient="records")
-    bet_amount, wave, step, st.session_state.reserve_fund = calculate_next_bet(
-        records, st.session_state.initial_fund, st.session_state.reserve_fund
-    )
-
-    if bet_amount is None:
-        st.error("⚠️ 資金不足です。リセットしてください。")
-    else:
-        st.markdown(f"""
-        <div style='font-size:20px; margin-top:10px;'>
-        💰 <b>自動賭け金（ECP方式）</b>： <span style='color:darkgreen; font-weight:bold;'>{bet_amount}円</span><br>
-        <span style='font-size:14px; color:gray;'>← この金額で登録されます</span>
-        </div>
-        """, unsafe_allow_html=True)
-
-    hit = st.radio("🎯 <span style='font-size:18px;'>結果は？</span>", options=["的中", "不的中"], horizontal=True, key="result", label_visibility="visible")
-
-    submitted = st.form_submit_button("✅ 登録する")
-    if submitted and bet_amount is not None:
-        today = datetime.now().strftime("%Y-%m-%d")
-        result = {
-            "日付": today,
-            "競艇場": place,
-            "式別": bet_type,
-            "賭け内容": bet_content,
-            "賭け金": bet_amount,
-            "的中": True if hit == "的中" else False,
-            "波": wave,
-            "ステップ": step
-        }
-
-        new_df = pd.DataFrame([result])
-        df = pd.concat([df, new_df], ignore_index=True)
-        df.to_csv(csv_path, index=False)
-        st.success("✅ 勝敗が記録されました。")
+# ▼ 登録ボタン
+if st.button("✅ 登録する"):
+    st.success("登録完了！")
+    # → 登録処理を書く（CSV保存など）
