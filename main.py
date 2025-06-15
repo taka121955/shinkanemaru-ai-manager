@@ -8,17 +8,22 @@ from pages.page4_record_result import show_page as show_page4
 
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ✅ 日本時間で現在時刻を表示
+# ✅ 現在の日本時間を中央に表示
 now = datetime.utcnow() + timedelta(hours=9)
-jst_time = now.strftime('%Y/%m/%d %H:%M:%S')
-st.markdown(f"<h3 style='text-align:center;'>🕰️ 現在の時刻（日本時間）：<br>{jst_time}</h3>", unsafe_allow_html=True)
+jst = now.strftime('%Y/%m/%d %H:%M:%S')
+st.markdown(
+    f"<div style='text-align:center; font-size:24px;'>🕰️ 現在の時刻（日本時間）：<br>{jst}</div><br>",
+    unsafe_allow_html=True
+)
 
-# ✅ セッション管理（初期ページ）
+# ✅ セッションでページを記録
 if "page" not in st.session_state:
     st.session_state.page = "①AI予想"
 
-# ✅ ボタン配置（2列ずつ中央）
-col1, col2 = st.columns(2)
+# ✅ ボタンを2列 × 2段で中央配置
+st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
+
+col1, col2 = st.columns([1, 1], gap="medium")
 with col1:
     if st.button("①AI予想"):
         st.session_state.page = "①AI予想"
@@ -26,7 +31,7 @@ with col2:
     if st.button("②勝敗入力"):
         st.session_state.page = "②勝敗入力"
 
-col3, col4 = st.columns(2)
+col3, col4 = st.columns([1, 1], gap="medium")
 with col3:
     if st.button("③統計データ"):
         st.session_state.page = "③統計データ"
@@ -34,7 +39,9 @@ with col4:
     if st.button("④結果履歴"):
         st.session_state.page = "④結果履歴"
 
-# ✅ ページ内容表示
+st.markdown("</div><br>", unsafe_allow_html=True)
+
+# ✅ ページ切替処理
 if st.session_state.page == "①AI予想":
     show_page1()
 elif st.session_state.page == "②勝敗入力":
@@ -44,6 +51,6 @@ elif st.session_state.page == "③統計データ":
 elif st.session_state.page == "④結果履歴":
     show_page4()
 
-# ✅ フッター中央寄せ
+# ✅ フッター（中央寄せ）
 st.markdown("---")
 st.markdown("<div style='text-align:center;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
