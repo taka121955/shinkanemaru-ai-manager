@@ -1,20 +1,42 @@
+# 📄 pages/page6_funds_setting.py
 import streamlit as st
+import json
+import os
 
-st.title("⑥ 設定ページ（積立・準備金など）")
+DATA_FILE = "funds_data.json"
 
-# 初期化（1回目だけ）
-st.session_state.setdefault("目標金額", 0)
-st.session_state.setdefault("準備金額", 0)
-st.session_state.setdefault("積立金額", 0)
+def save_funds(goal, reserve, saving):
+    data = {
+        "目標金額": goal,
+        "準備金額": reserve,
+        "積立金額": saving
+    }
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f)
 
-# 表示＆入力
-st.session_state["目標金額"] = st.number_input("🎯 目標金額", step=1000, value=st.session_state["目標金額"])
-st.session_state["準備金額"] = st.number_input("💰 準備金額", step=1000, value=st.session_state["準備金額"])
-st.session_state["積立金額"] = st.number_input("📦 積立金額", step=1000, value=st.session_state["積立金額"])
+def load_funds():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"目標金額": 0, "準備金額": 0, "積立金額": 0}
 
-# リセット機能（クリア用）
-if st.button("🔁 リセット（全て0円に戻す）", type="primary"):
-    st.session_state["目標金額"] = 0
-    st.session_state["準備金額"] = 0
-    st.session_state["積立金額"] = 0
-    st.error("🔴 金額をリセットしました（保存はされません）")
+def show_page():
+    st.markdown("### 💰 資金設定ページ")
+
+    current = load_funds()
+
+    st.markdown("#### 🎯 現在の設定")
+    st.markdown(f"- 🎯 目標金額：**{current['目標金額']:,}円**")
+    st.markdown(f"- 💼 準備金額：**{current['準備金額']:,}円**")
+    st.markdown(f"- 📦 積立金額：**{current['積立金額']:,}円**")
+
+    st.markdown("---")
+    st.markdown("#### ✍️ 新しく設定する")
+
+    goal = st.number_input("🎯 目標金額を入力", value=current['目標金額'], step=1000)
+    reserve = st.number_input("💼 準備金額を入力", value=current['準備金額'], step=1000)
+    saving = st.number_input("📦 積立金額を入力", value=current['積立金額'], step=1000)
+
+    if st.button("✅ セットする"):
+        save_funds(goal, reserve, saving)
+        st.success("✅ 資金情報を更新しました！")
