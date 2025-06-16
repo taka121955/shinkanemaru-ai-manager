@@ -3,42 +3,43 @@ import pandas as pd
 from datetime import datetime
 import pytz
 
-# 現在時刻（日本時間）
-now = datetime.now(pytz.timezone("Asia/Tokyo")).strftime('%Y/%m/%d %H:%M:%S')
-st.markdown(f"<h4 style='text-align:center;'>🕰️ 現在時刻： {now}</h4>", unsafe_allow_html=True)
+# 日本時間の現在時刻
+jst = pytz.timezone("Asia/Tokyo")
+now = datetime.now(jst).strftime("%Y/%m/%d %H:%M:%S")
 
-# 見出し（小さめ）
-st.markdown("<h5 style='text-align:center;'>💼 現在の資金ステータス</h5>", unsafe_allow_html=True)
+# スタイル調整
+st.markdown(f"<h3 style='text-align:center;'>🕰️ 現在時刻：{now}</h3>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>💼 現在の資金ステータス</h4>", unsafe_allow_html=True)
 
-# 表データ（縦並び）
-data = {
-    "項目①": ["🎯 目標金額", "10,000円",
-             "💰 準備資金", "10,000円",
-             "📊 積立資金", "0円",
-             "🧾 総収支", "+4,800円",
-             "📈 開始日", "2025/06/01",
-             "🎯 的中回数", "23回"],
+# ステータス表（2列×6行構成）
+status_data = [
+    ["🎯 目標金額", "10,000円", "🏆 勝率", "70%"],
+    ["💰 準備資金", "10,000円", "🎯 的中率", "85%"],
+    ["📊 積立資金", "0円", "💹 回収率", "125%"],
+    ["🧾 総収支", "+4,800円", "📅 計測日数", "15日"],
+    ["📈 開始日", "2025/06/01", "📋 ベット回数", "40回"],
+    ["🎯 的中回数", "23回", "📉 平均回収率", "121%"]
+]
 
-    "項目②": ["🏆 勝率", "70%",
-             "🎯 的中率", "85%",
-             "💹 回収率", "125%",
-             "📅 計測日数", "15日",
-             "📋 ベット回数", "40回",
-             "📈 平均回収率", "121%"]
-}
+df_status = pd.DataFrame(status_data, columns=["項目①", "値①", "項目②", "値②"])
+st.dataframe(df_status.style.set_table_styles([
+    {'selector': 'th', 'props': [('font-size', '16px'), ('text-align', 'center')]},
+    {'selector': 'td', 'props': [('font-size', '16px'), ('text-align', 'center')]}
+]), use_container_width=True)
 
-df = pd.DataFrame(data)
-st.markdown(df.to_html(index=False, justify="center", border=1), unsafe_allow_html=True)
+# メニュー一覧タイトル
+st.markdown("<h4 style='text-align:center;'>📋 メニュー一覧</h4>", unsafe_allow_html=True)
 
-# メニュー
-st.markdown("<h5 style='text-align:center;'>📋 メニュー一覧</h5>", unsafe_allow_html=True)
+# メニュー表（2行×3列構成）
+menu_data = [
+    ["① AI予想", "② 勝敗入力", "③ 統計データ"],
+    ["④ 結果履歴", "⑤ 開催結果", "⑥ 設定"]
+]
+df_menu = pd.DataFrame(menu_data, columns=["MENU①", "MENU②", "MENU③"])
+st.dataframe(df_menu.style.set_table_styles([
+    {'selector': 'th', 'props': [('font-size', '15px'), ('text-align', 'center')]},
+    {'selector': 'td', 'props': [('font-size', '15px'), ('text-align', 'center')]}
+]), use_container_width=True)
 
-menu_df = pd.DataFrame({
-    "MENU①": ["① AI予想", "④ 結果履歴"],
-    "MENU②": ["② 勝敗入力", "⑤ 開催結果"],
-    "MENU③": ["③ 統計データ", "⑥ 設定"]
-})
-st.markdown(menu_df.to_html(index=False, justify="center", border=1), unsafe_allow_html=True)
-
-# 制作者名
-st.markdown("<div style='text-align:center; padding-top:10px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
+# 制作者名（下部中央に）
+st.markdown("<div style='text-align:center; margin-top: 20px;'>制作者：小島崇彦</div>", unsafe_allow_html=True)
