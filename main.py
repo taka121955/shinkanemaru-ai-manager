@@ -1,38 +1,29 @@
 import streamlit as st
 from datetime import datetime
 
-# ページ設定
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# 現在時刻（日本時間で表示）
-now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-st.markdown(f"🕒 現在時刻：**{now}**")
+# ✅ 現在時刻（日本時間）
+now = datetime.now()
+st.markdown(f"### 🕐 現在時刻：{now.strftime('%Y/%m/%d %H:%M:%S')}")
 
-# CSSスタイルで2列6行の表示レイアウト
-st.markdown("""
-<style>
-.grid-container {
-  display: grid;
-  grid-template-columns: 160px 160px;
-  grid-row-gap: 10px;
-  font-size: 20px;
-  margin-top: 20px;
-}
-.grid-container div {
-  padding: 5px 10px;
-}
-</style>
+# ✅ 2列表示：左＝資金系／右＝勝率系
+col1, col2 = st.columns(2)
 
-<div class="grid-container">
-  <div>🎯 目標金額</div><div>：10000円</div>
-  <div>💰 準備資金</div><div>：5000円</div>
-  <div>📊 積立資金</div><div>：2300円</div>
-  <div>🏆 勝率</div><div>：70%</div>
-  <div>🎯 的中率</div><div>：65%</div>
-  <div>💹 回収率</div><div>：115%</div>
-</div>
-""", unsafe_allow_html=True)
+with col1:
+    st.markdown("### 🎯 目標金額　　: 10000円")
+    st.markdown("### 💰 準備資金　　: 5000円")
+    st.markdown("### 📊 積立資金　　: 2300円")
 
-# 下部に制作者名
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown('<div style="text-align: right;">制作者：小島崇彦</div>', unsafe_allow_html=True)
+with col2:
+    st.markdown("### 🏆 勝率　　　　: 70%")
+    st.markdown("### 🎯 的中率　　　: 65%")
+    st.markdown("### 💹 回収率　　　: 115%")
+
+# ✅ ページ切替ボタン風メニュー（仮動作・本番はリンク化）
+st.markdown("---")
+selected_page = st.radio("📁 メニューを選択", ["① AI予想", "② 勝敗入力", "③ 統計データ", "④ 結果履歴", "⑤ 競艇結果"], horizontal=True)
+
+# ✅ 制作者名
+st.markdown("---")
+st.markdown("#### 制作者：小島崇彦")
