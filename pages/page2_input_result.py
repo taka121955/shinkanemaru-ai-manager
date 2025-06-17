@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 import os
 
+# ✅ 最初に書く！
+st.set_page_config(page_title="② 勝敗入力", layout="centered")
+
 def show_page():
-    st.set_page_config(page_title="② 勝敗入力", layout="centered")
     st.title("② 勝敗入力")
 
     # 🔽 初期化
@@ -50,6 +52,6 @@ def show_page():
     # 🔽 結果
     result = st.radio("✅ 結果", ["的中", "外れ"])
 
-    # 🔽 保存処理（今は仮）
+    # 🔽 保存処理（仮）
     if st.button("💾 登録"):
         st.success("勝敗結果を保存しました（仮処理）")
