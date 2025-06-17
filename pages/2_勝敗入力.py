@@ -1,39 +1,45 @@
-# pages/page2_input_result.py
+# pages/page3_statistics.py
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime
 
-# ✅ ページタイトル設定（サイドバー名に反映）
-st.set_page_config(page_title="② 勝敗入力", layout="centered")
+st.set_page_config(page_title="③ 統計データ", layout="centered")
 
 def show_page():
-    st.title("📝 勝敗結果の入力")
+    st.title("📊 統計データ")
 
-    st.markdown("#### 📅 レース結果を入力してください")
+    try:
+        df = pd.read_csv("results.csv")
+    except FileNotFoundError:
+        st.warning("⚠️ データがまだありません。勝敗入力をしてください。")
+        return
 
-    # 入力フォーム
-    with st.form("result_form"):
-        race_date = st.date_input("開催日", value=datetime.today())
-        place = st.selectbox("競艇場", ["蒲郡", "住之江", "戸田", "丸亀", "芦屋", "宮島"])
-        race_no = st.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
-        prediction = st.text_input("予想した舟券（例：1-2-3）")
-        result = st.text_input("実際の結果（例：1-2-3）")
-        amount = st.number_input("賭け金額（円）", min_value=0, step=100)
-        is_hit = st.radio("的中しましたか？", ["的中", "外れ"])
-        submitted = st.form_submit_button("✅ 登録する")
+    if df.empty:
+        st.warning("⚠️ データがまだありません。")
+        return
 
-    # 登録結果を表示（データ保存処理は後ほど拡張可能）
-    if submitted:
-        st.success("🎉 登録が完了しました！")
-        st.markdown("---")
-        st.markdown("#### 登録内容（確認）")
-        st.write({
-            "日付": race_date.strftime("%Y-%m-%d"),
-            "競艇場": place,
-            "レース": race_no,
-            "予想": prediction,
-            "結果": result,
-            "金額": f"{amount:,}円",
-            "的中": is_hit
-        })
+    st.markdown("### 🔎 集計結果")
+
+    total_bets = len(df)
+    hits = len(df[df["的中"] == "的中"])
+    total_amount = df["金額"].sum()
+    avg_bet = df["金額"].mean()
+
+    # 的中率・勝率
+    hit_rate = round((hits / total_bets) * 100, 2)
+
+    # 回収率を計算（結果と予想が一致したときのみ、3倍として仮定）
+    df["回収額"] = df.apply(lambda row: row["金額"] * 3 if row["予想"] == row["結果"] else 0, axis=1)
+    total_return = df["回収額"].sum()
+    return_rate = round((total_return / total_amount) * 100, 2) if total_amount > 0 else 0
+
+    st.write(f"🎯 的中率：**{hit_rate}%**")
+    st.write(f"💹 回収率：**{return_rate}%**")
+    st.write(f"📊 総ベット回数：{total_bets} 回")
+    st.write(f"💰 総ベット金額：{total_amount} 円")
+    st.write(f"📈 平均ベット金額：{avg_bet:.1f} 円")
+
+    st.markdown("---")
+    st.markdown("### 📄 最近の10件")
+
+    st.dataframe(df.tail(10), use_container_width=True)
