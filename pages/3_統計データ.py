@@ -3,27 +3,30 @@
 import streamlit as st
 import pandas as pd
 
-st.markdown("## 📊 統計データ")
+# ✅ ページタイトル（サイドバー名に反映）
+st.set_page_config(page_title="③ 統計データ", layout="centered")
 
-csv_path = "results.csv"
+def show_page():
+    st.title("📊 統計データ")
 
-# データ読み込み
-try:
-    df = pd.read_csv(csv_path)
-    total_games = len(df)
-    wins = df["的中"].sum()
-    total_bet = df["賭け金"].sum()
-    total_return = (df["的中"] * df["オッズ"] * df["賭け金"]).sum()
+    st.markdown("#### 📈 勝敗・回収・的中などの統計を確認できます")
 
-    # 勝率・回収率・的中率
-    win_rate = wins / total_games * 100 if total_games > 0 else 0
-    hit_rate = wins / total_games * 100 if total_games > 0 else 0
-    recovery_rate = total_return / total_bet * 100 if total_bet > 0 else 0
+    # 仮の統計データ（本番では過去入力やCSVから計算）
+    stats_data = {
+        "項目": [
+            "総ベット回数", "的中回数", "勝率", "的中率", 
+            "総収支", "平均回収率", "最高配当的中", "AI予想精度"
+        ],
+        "値": [
+            "40回", "23回", "70%", "85%",
+            "+4,800円", "121%", "28.4倍", "78.2%"
+        ]
+    }
 
-    st.metric("🏆 勝率", f"{win_rate:.1f}%")
-    st.metric("💸 回収率", f"{recovery_rate:.1f}%")
-    st.metric("🎯 的中率", f"{hit_rate:.1f}%")
+    df = pd.DataFrame(stats_data)
 
-except Exception as e:
-    st.warning("データが読み込めませんでした。まだ記録が存在しない可能性があります。")
-    st.text(str(e))
+    # 表として表示
+    st.table(df)
+
+    st.markdown("---")
+    st.markdown("※ これらの数値は今後、入力履歴やAI学習と連動してリアルタイム集計予定です。")
