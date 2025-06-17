@@ -1,42 +1,30 @@
+# pages/page1_ai_prediction.py
+
 import streamlit as st
-import pandas as pd
-import random
 from datetime import datetime
-import pytz
 
-st.markdown("## 📉 本日のAI予想（上位10件）")
+# ✅ サイドバー用のページタイトル設定
+st.set_page_config(page_title="① AI予想", layout="centered")
 
-# 日本時間の現在時刻を表示
-now = datetime.now(pytz.timezone("Asia/Tokyo"))
-st.markdown(f"#### 🕰️ 現在の時刻： {now.strftime('%Y/%m/%d %H:%M:%S')}")
+def show_page():
+    st.title("🧠 AI予想")
 
-# 仮の実績ベースで精度風に構築
-race_types = ["単勝", "2連単", "3連単"]
-boats = ["唐津", "若松", "住之江", "丸亀", "平和島", "福岡", "常滑", "芦屋", "尼崎", "津"]
-rows = []
+    # 現在日時の表示（日本時間）
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    st.markdown(f"#### ⏰ 現在時刻：{now}")
 
-for i in range(10):
-    place = boats[i % len(boats)]
-    race_no = f"{random.randint(1,12)}R"
-    type_ = random.choice(race_types)
-    
-    if type_ == "単勝":
-        content = f"{random.randint(1,6)}"
-    elif type_ == "2連単":
-        content = f"{random.randint(1,6)}-{random.randint(1,6)}"
-    else:
-        content = f"{random.randint(1,6)}-{random.randint(1,6)}-{random.randint(1,6)}"
-    
-    # 的中率重視なので高めに設定
-    accuracy = f"{random.randint(70, 90)}%"
-    
-    rows.append({
-        "競艇場": place,
-        "レース番号": race_no,
-        "式別": type_,
-        "投票内容": content,
-        "的中率": accuracy
-    })
+    st.markdown("---")
 
-df = pd.DataFrame(rows)
-st.table(df)
+    # 仮データ（本来はAI出力に置き換え）
+    st.markdown("### 📊 本日のおすすめレース（仮）")
+
+    predictions = [
+        {"競艇場": "蒲郡", "レース": "1R", "式別": "3連単", "予想": "1-2-3", "確率": "76%"},
+        {"競艇場": "住之江", "レース": "5R", "式別": "2連単", "予想": "2-4", "確率": "68%"},
+        {"競艇場": "戸田", "レース": "12R", "式別": "単勝", "予想": "6", "確率": "64%"},
+    ]
+
+    for p in predictions:
+        st.markdown(
+            f"🏟️ **{p['競艇場']}**｜{p['レース']}｜{p['式別']}｜🎯 予想：**{p['予想']}**｜的中確率：**{p['確率']}**"
+        )
