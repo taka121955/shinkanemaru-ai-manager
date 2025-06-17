@@ -1,15 +1,11 @@
-# pages/page2_input_result.py
-
 import streamlit as st
-st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ✅ これが一番最初！
+st.set_page_config(page_title="② 勝敗入力", layout="centered")
 
 import pandas as pd
 from datetime import datetime
 
 def show_page():
     st.title("📝 勝敗結果の入力")
-    st.markdown("#### 📅 レース結果を入力してください")
-
     with st.form("result_form"):
         race_date = st.date_input("開催日", value=datetime.today())
         place = st.selectbox("競艇場", ["蒲郡", "住之江", "戸田", "丸亀", "芦屋", "宮島"])
@@ -40,5 +36,4 @@ def show_page():
         df.to_csv("results.csv", index=False)
 
         st.success("✅ 登録が完了しました！")
-        st.markdown("#### 📋 登録内容")
         st.write(new_record)
