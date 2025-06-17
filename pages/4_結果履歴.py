@@ -2,32 +2,25 @@
 
 import streamlit as st
 import pandas as pd
-import os
 
-# ✅ ページ設定（タイトルとレイアウト）
 st.set_page_config(page_title="④ 結果履歴", layout="centered")
 
 def show_page():
-    st.title("📜 結果履歴")
-
-    st.markdown("#### 📄 過去に入力された勝敗データ一覧")
-
-    # CSVファイル名
-    csv_path = "results.csv"
-
-    # ファイルが存在しない場合
-    if not os.path.exists(csv_path):
-        st.warning("📂 結果データ（results.csv）がまだ存在しません。")
-        st.info("勝敗入力ページからレース結果を登録すると、ここに一覧が表示されます。")
-        return
+    st.title("📖 結果履歴")
 
     try:
-        # CSV読み込み
-        df = pd.read_csv(csv_path)
+        df = pd.read_csv("results.csv")
+    except FileNotFoundError:
+        st.warning("⚠️ データがまだありません。勝敗入力してください。")
+        return
 
-        if df.empty:
-            st.info("📭 結果データはまだ登録されていません。")
-        else:
-            st.dataframe(df, use_container_width=True)
-    except Exception as e:
-        st.error(f"エラーが発生しました: {e}")
+    if df.empty:
+        st.warning("⚠️ データがまだ登録されていません。")
+        return
+
+    st.markdown("### 📋 登録されたすべての結果")
+
+    # 日付順に並び替え（新しい順）
+    df_sorted = df.sort_values(by="日付", ascending=False)
+
+    st.dataframe(df_sorted, use_container_width=True)
