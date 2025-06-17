@@ -1,16 +1,15 @@
-# main.py
+# main.py（修正版）
 
 import streamlit as st
-from pages.1_AI予想 import show_page as show_page1
-from pages.2_勝敗入力 import show_page as show_page2
-from pages.3_統計データ import show_page as show_page3
-from pages.4_結果履歴 import show_page as show_page4
-from pages.5_出走表 import show_page as show_page5
-from pages.6_設定 import show_page as show_page6
+from pages.page1_ai_prediction import show_page as show_page1
+from pages.page2_input_result import show_page as show_page2
+from pages.page3_statistics import show_page as show_page3
+from pages.page4_record_result import show_page as show_page4
+from pages.page5_today_schedule import show_page as show_page5
+from pages.page6_setting import show_page as show_page6
 from pages.page7_per_boatplace_prediction import show_page as show_page7
 from pages.page8_summary_today import show_page as show_page8
 
-# ✅ ページ選択（サイドバー）
 selected_page = st.sidebar.radio("📑 ページ選択", [
     "① AI予想",
     "② 勝敗入力",
@@ -22,7 +21,6 @@ selected_page = st.sidebar.radio("📑 ページ選択", [
     "⑧ 今日の結果まとめ"
 ])
 
-# ✅ 各ページを表示
 if selected_page == "① AI予想":
     show_page1()
 elif selected_page == "② 勝敗入力":
