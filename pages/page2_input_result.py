@@ -1,7 +1,5 @@
-# pages/page2_input_result.py
-
 import streamlit as st
-st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ✅ 最初に記述
+st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ✅ 必ずこの順番で！
 
 import pandas as pd
 from datetime import datetime
