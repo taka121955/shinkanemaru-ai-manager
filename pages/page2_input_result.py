@@ -1,50 +1,40 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
-import pytz
-import os
+from datetime import date
 
-RESULTS_FILE = "results.csv"
+# ✅ ページ設定
+st.set_page_config(page_title="② 勝敗入力", layout="centered")
 
 def show_page():
-    st.markdown("## ② 勝敗入力")
+    st.markdown("## ② 勝敗入力 📝")
 
-    # 入力フォーム
-    with st.form("result_form"):
-        col1, col2 = st.columns(2)
-        with col1:
-            date = st.date_input("📅 日付", datetime.now().date())
-            race_place = st.text_input("🚩 競艇場名", "")
-            race_no = st.text_input("🎯 レース番号（例: 12R）", "")
-            bet_type = st.selectbox("🎲 式別", ["単勝", "複勝", "2連単", "3連単", "2連複", "3連複"])
-        with col2:
-            bet_content = st.text_input("📋 ベット内容（例: 1-2-3）", "")
-            bet_amount = st.number_input("💸 賭け金額（円）", min_value=0, step=100)
-            result = st.selectbox("✅ 結果", ["的中", "外れ"])
-            payout = st.number_input("🏆 払戻金額（円）", min_value=0, step=100)
+    # 📅 日付選択
+    selected_date = st.date_input("📅 日付", value=date.today())
 
-        submitted = st.form_submit_button("記録する")
+    # 🏁 競艇場名（例）
+    boat_places = ["住之江", "戸田", "芦屋", "丸亀", "蒲郡", "大村", "若松", "唐津", "徳山", "児島"]
+    boat_place = st.selectbox("🚤 競艇場名", boat_places)
 
-    if submitted:
-        jst = pytz.timezone("Asia/Tokyo")
-        now = datetime.now(jst).strftime("%Y/%m/%d %H:%M:%S")
-        data = {
-            "記録時間": now,
-            "日付": str(date),
-            "競艇場": race_place,
-            "レース": race_no,
-            "式別": bet_type,
-            "ベット": bet_content,
-            "賭け金額": bet_amount,
-            "結果": result,
-            "払戻": payout
-        }
+    # 🏁 レース番号
+    race_number = st.selectbox("🎯 レース番号（例：12R）", [f"{i}R" for i in range(1, 13)])
 
-        if os.path.exists(RESULTS_FILE):
-            df = pd.read_csv(RESULTS_FILE)
-        else:
-            df = pd.DataFrame()
+    # 🎲 式別
+    styles = ["単勝", "2連単", "2連複", "3連単", "3連複"]
+    bet_style = st.selectbox("🎲 式別", styles)
 
-        df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
-        df.to_csv(RESULTS_FILE, index=False)
-        st.success("✅ 結果が記録されました！")
+    # 🐎 ベット内容
+    st.markdown("### 🔢 ベット内容（例：1-2-3）")
+    col1, col2, col3 = st.columns(3)
+    first = col1.selectbox("1着", list(range(1, 7)))
+    second = col2.selectbox("2着", list(range(1, 7)))
+    third = col3.selectbox("3着", list(range(1, 7)))
+
+    # 💴 金額
+    amount = st.number_input("💰 賭け金額（円）", min_value=0, step=100)
+
+    # ✅ 的中 or 不的中
+    result = st.radio("✅ 結果", ["的中", "不的中"])
+
+    # 💾 入力確認
+    st.markdown("---")
+    if st.button("登録する"):
+        st.success(f"✅ 登録完了：{selected_date} {boat_place} {race_number}（{bet_style}） {first}-{second}-{third} / {amount}円 / {result}")
