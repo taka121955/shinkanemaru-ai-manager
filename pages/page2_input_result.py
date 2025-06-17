@@ -1,57 +1,57 @@
 import streamlit as st
 import pandas as pd
-import os
+from datetime import date
 
-# ✅ 最初に書く！
 st.set_page_config(page_title="② 勝敗入力", layout="centered")
 
 def show_page():
-    st.title("② 勝敗入力")
+    st.markdown("## ② 勝敗入力")
 
-    # 🔽 初期化
-    predictions_df = None
-    race_options = []
-    place_options = []
+    # ✅ データの読み込み（存在しない場合でも動作するようにする）
+    try:
+        df = pd.read_csv("ai_predictions.csv")
+        options = df[["競艇場", "レース"]].drop_duplicates().reset_index(drop=True)
+        options["表示"] = options["競艇場"] + " - " + options["レース"]
+        selected = st.selectbox("①の予想から選択", [""] + options["表示"].tolist())
 
-    # 🔽 CSV読み込み（存在すれば）
-    csv_path = "ai_predictions.csv"
-    if os.path.exists(csv_path):
-        try:
-            predictions_df = pd.read_csv(csv_path)
-            race_options = predictions_df["レース番号"].unique().tolist()
-            place_options = predictions_df["競艇場"].unique().tolist()
-        except Exception as e:
-            st.warning(f"CSV読み込みに失敗しました: {e}")
-    else:
+        if selected != "":
+            selected_row = options[options["表示"] == selected].iloc[0]
+            default_place = selected_row["競艇場"]
+            default_race = selected_row["レース"]
+        else:
+            default_place = ""
+            default_race = ""
+    except Exception as e:
         st.warning("①のデータ（ai_predictions.csv）が見つからないか、読み込みに失敗しました。")
+        default_place = ""
+        default_race = ""
 
-    st.subheader("📅 日付・レース情報")
+    # ✅ 入力フォーム
+    st.markdown("### 📅 日付・レース情報")
+    col1, col2 = st.columns(2)
+    with col1:
+        race_date = st.date_input("日付", date.today())
+    with col2:
+        place = st.text_input("競艇場名", value=default_place)
 
-    # 🔽 日付
-    date = st.date_input("日付")
+    race_number = st.text_input("レース番号（例: 12R）", value=default_race)
 
-    # 🔽 競艇場名（CSV連動 or 手動）
-    race_place = st.selectbox("競艇場名", place_options if place_options else ["びわこ", "住之江", "丸亀", "若松", "蒲郡", "芦屋", "徳山", "唐津", "平和島"])
+    bet_type = st.selectbox("🎯 式別", ["単勝", "複勝", "2連単", "2連複", "3連単", "3連複"])
 
-    # 🔽 レース番号（CSV連動 or 手動）
-    race_no = st.selectbox("レース番号", race_options if race_options else [f"{i}R" for i in range(1, 13)])
-
-    # 🔽 式別
-    shikibetsu = st.selectbox("🎯 式別", ["単勝", "2連複", "2連単", "3連複", "3連単"])
-
-    # 🔽 ベット内容
-    st.subheader("🎲 ベット内容")
+    st.markdown("### 🎲 ベット内容（例: 1-2-3）")
     col1, col2, col3 = st.columns(3)
-    bet1 = col1.selectbox("1着", list(range(1, 7)))
-    bet2 = col2.selectbox("2着", list(range(1, 7)))
-    bet3 = col3.selectbox("3着", list(range(1, 7)))
+    with col1:
+        first = st.selectbox("1着", [""] + [str(i) for i in range(1, 7)])
+    with col2:
+        second = st.selectbox("2着", [""] + [str(i) for i in range(1, 7)])
+    with col3:
+        third = st.selectbox("3着", [""] + [str(i) for i in range(1, 7)])
 
-    # 🔽 金額
-    amount = st.number_input("💰 賭け金額（円）", min_value=0, step=100)
+    bet_amount = st.number_input("💴 賭け金額（円）", min_value=0, step=100)
 
-    # 🔽 結果
-    result = st.radio("✅ 結果", ["的中", "外れ"])
+    is_win = st.checkbox("✅ 結果", value=False)
+    st.write("🎯 的中" if is_win else "❌ 外れ")
 
-    # 🔽 保存処理（仮）
-    if st.button("💾 登録"):
-        st.success("勝敗結果を保存しました（仮処理）")
+    # ✅ 登録ボタン
+    if st.button("登録する"):
+        st.success("登録が完了しました！")
