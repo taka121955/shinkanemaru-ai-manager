@@ -1,27 +1,6 @@
 import streamlit as st
 st.set_page_config(page_title="③ 統計データ", layout="centered")
 
-import pandas as pd
-
 def show_page():
-    st.title("📊 統計データの表示")
-    try:
-        df = pd.read_csv("results.csv")
-        if df.empty:
-            st.warning("⚠️ データがまだ登録されていません。")
-            return
-
-        total_bets = len(df)
-        total_hits = (df["的中"] == "的中").sum()
-        hit_rate = round(total_hits / total_bets * 100, 1)
-        total_amount = df["金額"].sum()
-        avg_amount = round(total_amount / total_bets, 1)
-
-        st.metric("ベット回数", f"{total_bets} 回")
-        st.metric("的中回数", f"{total_hits} 回")
-        st.metric("的中率", f"{hit_rate} %")
-        st.metric("合計ベット額", f"{total_amount} 円")
-        st.metric("平均ベット額", f"{avg_amount} 円")
-
-    except:
-        st.warning("❌ 'results.csv' が存在しません。")
+    st.title("③ 統計データ")
+    st.write("統計データの可視化グラフなどをここに配置します。")
