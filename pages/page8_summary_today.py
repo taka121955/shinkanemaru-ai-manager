@@ -4,18 +4,14 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 
-st.set_page_config(page_title="⑧ 本日の結果まとめ", layout="centered")
+st.set_page_config(page_title="⑧ 今日の結果まとめ", layout="centered")
 
 def show_page():
-    st.title("📅 本日の結果まとめ")
+    st.title("📅 今日の結果まとめ")
 
-    # 日付表示
     today = date.today().strftime("%Y年%m月%d日（%a）")
     st.markdown(f"### 🗓️ {today} の集計結果")
 
-    st.markdown("---")
-
-    # 仮の結果データ（あとでCSVやDB連携可能）
     data = {
         "競艇場": ["蒲郡", "住之江", "戸田", "丸亀"],
         "的中レース数": [5, 3, 4, 6],
@@ -27,9 +23,6 @@ def show_page():
     }
 
     df = pd.DataFrame(data)
-
     st.dataframe(df, use_container_width=True)
 
-    st.markdown("---")
-    st.markdown("📌 上記は当日全場の合計または会場別集計のサンプルです。")
-    st.markdown("✅ 実際のデータは勝敗入力ページと連動可能です（CSV/DB保存で拡張）。")
+    st.markdown("※ データは仮です。将来は入力履歴からの自動集計へ対応します。")
