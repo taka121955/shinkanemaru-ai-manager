@@ -1,14 +1,13 @@
 # pages/page2_input_result.py
 
 import streamlit as st
-st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ← 必ず先頭に記述！
+st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ← 必ずこの位置！
 
 import pandas as pd
 from datetime import datetime
 
 def show_page():
     st.title("📝 勝敗結果の入力")
-
     st.markdown("#### 📅 レース結果を入力してください")
 
     with st.form("result_form"):
