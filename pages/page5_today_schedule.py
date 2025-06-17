@@ -1,24 +1,26 @@
-# pages/page5_boat_results.py
+# pages/page5_today_schedule.py
 
 import streamlit as st
+from datetime import datetime
 
-st.markdown("## 🏁 競艇結果（準備中）")
+st.title("📅 本日の出走表")
 
-st.info("このページでは、将来的に競艇場ごとのレース結果や出走表、天候情報、レース動画などを表示予定です。")
+# 今日の日付を自動表示
+today = datetime.now().strftime("%Y年%m月%d日（%a）")
+st.markdown(f"### 📆 {today}")
 
-st.markdown("""
----
+# 仮の開催競艇場リスト（今後自動取得化可）
+today_boat_places = [
+    "蒲郡競艇場",
+    "住之江競艇場",
+    "戸田競艇場",
+    "丸亀競艇場",
+    "芦屋競艇場",
+    "宮島競艇場"
+]
 
-### 🔜 今後の予定機能
-
-- 各競艇場の公式サイトリンク
-- 当日のレース一覧・出走表
-- AI予想 vs 実際の結果の比較
-- レース結果自動取得＆分析
-- 天候（風速・波など）の表示
-- レース動画リンク（公式 or YouTube）
-
----
-
-📢 ご要望があれば優先的に実装します！
-""")
+# 出走表を表示
+for place in today_boat_places:
+    st.markdown(f"#### 🏟️ {place}")
+    st.markdown("　- 第1R ～ 第12R")
+    st.markdown("---")
