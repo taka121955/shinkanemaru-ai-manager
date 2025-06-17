@@ -1,47 +1,41 @@
-
-# main.py
-
 import streamlit as st
-
-# ✅ Streamlitページ設定（最初のコマンド！）
-st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
-
-# ✅ 各ページの読み込み（show_page関数として読み込み）
+from datetime import datetime
 from pages.page1_ai_prediction import show_page as show_page1
 from pages.page2_input_result import show_page as show_page2
 from pages.page3_statistics import show_page as show_page3
 from pages.page4_record_result import show_page as show_page4
-from pages.page5_today_schedule import show_page as show_page5
-from pages.page6_settings import show_page as show_page6
-from pages.page7_per_boatplace_prediction import show_page as show_page7
-from pages.page8_summary_today import show_page as show_page8
 
-# ✅ サイドバーでページ切り替え
-selected_page = st.sidebar.radio("📑 メニュー選択", [
+# ✅ 最初に実行（set_page_config は1行目に近い場所で）
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
+
+# ✅ 上部情報表示
+st.markdown("### 🕒 現在時刻（日本時間）：")
+now = datetime.now()
+st.markdown(f"#### `{now.strftime('%Y/%m/%d %H:%M:%S')}`")
+
+st.markdown("### 🎯 目標金額：10000円")
+st.markdown("### 💰 初期資金：5000円")
+st.markdown("### 📊 累積資金：0円")
+
+# ✅ ページ切り替えメニュー
+st.sidebar.title(".main")  # ← GitHubのページ名を隠す
+menu = st.sidebar.radio("🔘 メニュー選択", [
     "① AI予想",
     "② 勝敗入力",
     "③ 統計データ",
-    "④ 結果履歴",
-    "⑤ 出走表",
-    "⑥ 設定",
-    "⑦ 出走場別12R予想",
-    "⑧ 今日の結果まとめ"
+    "④ 結果履歴"
 ])
 
-# ✅ ページ分岐表示
-if selected_page == "① AI予想":
+# ✅ 選択に応じたページ表示
+if menu == "① AI予想":
     show_page1()
-elif selected_page == "② 勝敗入力":
+elif menu == "② 勝敗入力":
     show_page2()
-elif selected_page == "③ 統計データ":
+elif menu == "③ 統計データ":
     show_page3()
-elif selected_page == "④ 結果履歴":
+elif menu == "④ 結果履歴":
     show_page4()
-elif selected_page == "⑤ 出走表":
-    show_page5()
-elif selected_page == "⑥ 設定":
-    show_page6()
-elif selected_page == "⑦ 出走場別12R予想":
-    show_page7()
-elif selected_page == "⑧ 今日の結果まとめ":
-    show_page8()
+
+# ✅ フッター
+st.markdown("---")
+st.markdown("制作者：小島崇彦")
