@@ -1,31 +1,44 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
 
-def show_page():
-    st.set_page_config(page_title="① AI予想", layout="centered")
+# ✅ ページ設定（必ず一番上に配置）
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-    st.markdown("## ① AI予想")
-    st.markdown(f"⏰ **現在時刻（日本時間）**： {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}")
+# ✅ 各ページの読み込み（関数名で読み込み）
+from pages.page1_ai_prediction import show_page as show_page1
+from pages.page2_input_result import show_page as show_page2
+from pages.page3_statistics import show_page as show_page3
+from pages.page4_record_result import show_page as show_page4
+from pages.page5_today_schedule import show_page as show_page5
+from pages.page6_settings import show_page as show_page6
+from pages.page7_per_boatplace_prediction import show_page as show_page7
+from pages.page8_summary_today import show_page as show_page8
 
-    # ✅ デモ用の仮データ（最大10件）
-    data = [
-        {"競艇場": "住之江", "レース": "12R", "式別": "3連単", "予想": "1-2-3", "金額": "1,000円", "確率": "83%"},
-        {"競艇場": "戸田", "レース": "10R", "式別": "2連複", "予想": "2-4", "金額": "500円", "確率": "74%"},
-        {"競艇場": "芦屋", "レース": "11R", "式別": "単勝", "予想": "3", "金額": "300円", "確率": "68%"},
-        {"競艇場": "丸亀", "レース": "9R", "式別": "3連複", "予想": "1-4-6", "金額": "400円", "確率": "72%"},
-        {"競艇場": "蒲郡", "レース": "7R", "式別": "2連単", "予想": "5-1", "金額": "800円", "確率": "79%"},
-        {"競艇場": "尼崎", "レース": "6R", "式別": "3連単", "予想": "1-3-2", "金額": "700円", "確率": "81%"},
-        {"競艇場": "平和島", "レース": "5R", "式別": "2連単", "予想": "3-6", "金額": "600円", "確率": "76%"},
-        {"競艇場": "唐津", "レース": "4R", "式別": "3連単", "予想": "2-1-5", "金額": "500円", "確率": "77%"},
-        {"競艇場": "若松", "レース": "3R", "式別": "単勝", "予想": "4", "金額": "300円", "確率": "70%"},
-        {"競艇場": "江戸川", "レース": "2R", "式別": "3連単", "予想": "1-6-5", "金額": "100円", "確率": "69%"},
-    ]
+# ✅ サイドバー（メニュー）
+selected_page = st.sidebar.radio("📑 メニュー選択", [
+    "① AI予想",
+    "② 勝敗入力",
+    "③ 統計データ",
+    "④ 結果履歴",
+    "⑤ 出走表",
+    "⑥ 設定",
+    "⑦ 出走場別12R予想",
+    "⑧ 今日の結果まとめ"
+])
 
-    df = pd.DataFrame(data)
-
-    # ✅ 表の表示
-    st.dataframe(df, use_container_width=True)
-
-    # ✅ CSVとして保存（②で使う用）
-    df.to_csv("ai_predictions.csv", index=False)
+# ✅ ページ切り替え
+if selected_page == "① AI予想":
+    show_page1()
+elif selected_page == "② 勝敗入力":
+    show_page2()
+elif selected_page == "③ 統計データ":
+    show_page3()
+elif selected_page == "④ 結果履歴":
+    show_page4()
+elif selected_page == "⑤ 出走表":
+    show_page5()
+elif selected_page == "⑥ 設定":
+    show_page6()
+elif selected_page == "⑦ 出走場別12R予想":
+    show_page7()
+elif selected_page == "⑧ 今日の結果まとめ":
+    show_page8()
