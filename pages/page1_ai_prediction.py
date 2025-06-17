@@ -1,20 +1,13 @@
-# pages/page1_ai_prediction.py
-
 import streamlit as st
-from datetime import datetime
-
 st.set_page_config(page_title="① AI予想", layout="centered")
+
+from datetime import datetime
 
 def show_page():
     st.title("🧠 AI予想")
-
-    # 現在の時刻を表示
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.markdown(f"#### ⏰ 現在時刻：{now}")
     st.markdown("---")
-
-    # 仮のAI予想データ（将来はAIモデル接続）
-    st.markdown("### 📊 本日のおすすめレース（仮）")
 
     predictions = [
         {"競艇場": "蒲郡", "レース": "1R", "式別": "3連単", "予想": "1-2-3", "確率": "76%"},
