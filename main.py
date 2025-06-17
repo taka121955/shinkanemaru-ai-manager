@@ -10,7 +10,7 @@ from pages.page6_settings import show_page as show_page6
 from pages.page7_per_boatplace_prediction import show_page as show_page7
 from pages.page8_summary_today import show_page as show_page8
 
-# ✅ ページ設定（※先頭に配置）
+# ✅ Streamlitページ設定（最初に必ず書く！）
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
 # ✅ サイドバーでページ切り替え
