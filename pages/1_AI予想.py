@@ -3,19 +3,17 @@
 import streamlit as st
 from datetime import datetime
 
-# ✅ サイドバー用のページタイトル設定
 st.set_page_config(page_title="① AI予想", layout="centered")
 
 def show_page():
     st.title("🧠 AI予想")
 
-    # 現在日時の表示（日本時間）
+    # 現在の時刻を表示
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     st.markdown(f"#### ⏰ 現在時刻：{now}")
-
     st.markdown("---")
 
-    # 仮データ（本来はAI出力に置き換え）
+    # 仮のAI予想データ（将来はAIモデル接続）
     st.markdown("### 📊 本日のおすすめレース（仮）")
 
     predictions = [
