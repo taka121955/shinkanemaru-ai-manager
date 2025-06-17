@@ -1,7 +1,7 @@
 # pages/page3_statistics.py
 
 import streamlit as st
-st.set_page_config(page_title="③ 統計データ", layout="centered")  # ✅ 最初に書く！
+st.set_page_config(page_title="③ 統計データ", layout="centered")  # ✅ 最上部に配置
 
 import pandas as pd
 
