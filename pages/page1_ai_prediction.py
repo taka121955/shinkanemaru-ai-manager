@@ -2,14 +2,13 @@ import streamlit as st
 from datetime import datetime
 import pandas as pd
 
-def show_page():
-    # ページ設定（必ず最初）
-    st.set_page_config(page_title="① AI予想", layout="centered")
+# ✅ ページ設定は一番上で最初に書く！
+st.set_page_config(page_title="① AI予想", layout="centered")
 
+def show_page():
     st.title("① AI予想")
     st.markdown("▶️ **現在時刻（日本時間）** ： " + datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
 
-    # 予想データ（10件）
     data = {
         "競艇場": ["住之江", "戸田", "芦屋", "丸亀", "蒲郡", "平和島", "唐津", "若松", "江戸川", "びわこ"],
         "レース": ["12R", "10R", "11R", "9R", "7R", "5R", "8R", "6R", "12R", "4R"],
