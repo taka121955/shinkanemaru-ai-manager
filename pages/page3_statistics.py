@@ -1,32 +1,42 @@
 # pages/page3_statistics.py
 
 import streamlit as st
-import pandas as pd
+st.set_page_config(page_title="③ 統計データ", layout="centered")  # ✅ 最初に書く！
 
-# ✅ ページタイトル（サイドバー名に反映）
-st.set_page_config(page_title="③ 統計データ", layout="centered")
+import pandas as pd
 
 def show_page():
     st.title("📊 統計データ")
 
-    st.markdown("#### 📈 勝敗・回収・的中などの統計を確認できます")
+    try:
+        df = pd.read_csv("results.csv")
+    except FileNotFoundError:
+        st.warning("⚠️ データがまだありません。勝敗入力をしてください。")
+        return
 
-    # 仮の統計データ（本番では過去入力やCSVから計算）
-    stats_data = {
-        "項目": [
-            "総ベット回数", "的中回数", "勝率", "的中率", 
-            "総収支", "平均回収率", "最高配当的中", "AI予想精度"
-        ],
-        "値": [
-            "40回", "23回", "70%", "85%",
-            "+4,800円", "121%", "28.4倍", "78.2%"
-        ]
-    }
+    if df.empty:
+        st.warning("⚠️ データがまだありません。")
+        return
 
-    df = pd.DataFrame(stats_data)
+    st.markdown("### 🔎 集計結果")
 
-    # 表として表示
-    st.table(df)
+    total_bets = len(df)
+    hits = len(df[df["的中"] == "的中"])
+    total_amount = df["金額"].sum()
+    avg_bet = df["金額"].mean()
+
+    hit_rate = round((hits / total_bets) * 100, 2)
+
+    df["回収額"] = df.apply(lambda row: row["金額"] * 3 if row["予想"] == row["結果"] else 0, axis=1)
+    total_return = df["回収額"].sum()
+    return_rate = round((total_return / total_amount) * 100, 2) if total_amount > 0 else 0
+
+    st.write(f"🎯 的中率：**{hit_rate}%**")
+    st.write(f"💹 回収率：**{return_rate}%**")
+    st.write(f"📊 総ベット回数：{total_bets} 回")
+    st.write(f"💰 総ベット金額：{total_amount} 円")
+    st.write(f"📈 平均ベット金額：{avg_bet:.1f} 円")
 
     st.markdown("---")
-    st.markdown("※ これらの数値は今後、入力履歴やAI学習と連動してリアルタイム集計予定です。")
+    st.markdown("### 📄 最近の10件")
+    st.dataframe(df.tail(10), use_container_width=True)
