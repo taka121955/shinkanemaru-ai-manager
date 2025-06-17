@@ -1,43 +1,35 @@
+# pages/page6_settings.py
+
 import streamlit as st
-import os
-import json
 
-funds_file = "utils/funds.json"
+st.set_page_config(page_title="⑥ 設定", layout="centered")
 
-# 初期化用のデフォルト値
-default_funds = {"target": 0, "reserve": 0, "savings": 0}
+def show_page():
+    st.title("⚙️ 設定ページ")
 
-# 保存関数
-def save_funds(data):
-    os.makedirs("utils", exist_ok=True)
-    with open(funds_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    st.markdown("#### 🧭 アプリの基本設定を行うページです")
 
-# 読み込み関数
-def load_funds():
-    if os.path.exists(funds_file):
-        with open(funds_file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return default_funds
+    st.markdown("---")
 
-# ページタイトル
-st.title("⑥ 資金設定")
+    # 📌 初期資金や目標金額の入力（未保存：表示目的）
+    col1, col2 = st.columns(2)
 
-# 現在の資金情報を読み込み
-funds = load_funds()
+    with col1:
+        goal = st.text_input("🎯 目標金額（例：100000）", value="100000")
+    with col2:
+        base = st.text_input("💰 初期資金（例：10000）", value="10000")
 
-# フォーム
-with st.form("fund_settings_form"):
-    target = st.number_input("🎯 目標金額", min_value=0, value=funds["target"], step=1000)
-    reserve = st.number_input("💼 準備金額", min_value=0, value=funds["reserve"], step=1000)
-    savings = st.number_input("📦 積立金額", min_value=0, value=funds["savings"], step=1000)
-    submitted = st.form_submit_button("💾 セットする")
-    if submitted:
-        new_data = {"target": target, "reserve": reserve, "savings": savings}
-        save_funds(new_data)
-        st.success("✅ 資金情報を保存しました！")
+    st.markdown("---")
 
-# 🔴 クリアボタン（資金データ初期化）
-if st.button("🧹 資金情報をクリア（リセット）", type="primary"):
-    save_funds(default_funds)
-    st.warning("⚠️ 資金情報を初期化しました。")
+    # 🔔 通知設定（仮UI）
+    st.markdown("#### 🔔 通知設定（※今後実装）")
+    email_notify = st.checkbox("📧 メール通知を有効にする", value=True)
+    line_notify = st.checkbox("💬 LINE通知を有効にする", value=False)
+
+    st.markdown("---")
+
+    # 💾 保存ボタン（仮）
+    if st.button("💾 設定を保存"):
+        st.success("✅ 設定内容を保存しました（仮処理）")
+
+    st.markdown("※ 本設定は現時点では保存機能はありません。今後のアップデートで外部ファイル保存またはDB連携予定です。")
