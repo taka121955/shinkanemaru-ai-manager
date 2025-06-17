@@ -1,19 +1,16 @@
 import streamlit as st
 
-# ✅ 各ページの読み込み（show_page関数として読み込み）
 from pages.page1_ai_prediction import show_page as show_page1
 from pages.page2_input_result import show_page as show_page2
 from pages.page3_statistics import show_page as show_page3
 from pages.page4_record_result import show_page as show_page4
 from pages.page5_today_schedule import show_page as show_page5
 from pages.page6_settings import show_page as show_page6
-from pages.page7_per_boatplace_prediction import show_page as show_page7
-from pages.page8_summary_today import show_page as show_page8
+from pages.page7_daily_predictions import show_page as show_page7
+from pages.page8_today_result_summary import show_page as show_page8
 
-# ✅ Streamlitページ設定（最初に必ず書く！）
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ✅ サイドバーでページ切り替え
 selected_page = st.sidebar.radio("📑 メニュー選択", [
     "① AI予想",
     "② 勝敗入力",
@@ -25,7 +22,6 @@ selected_page = st.sidebar.radio("📑 メニュー選択", [
     "⑧ 今日の結果まとめ"
 ])
 
-# ✅ ページ分岐表示
 if selected_page == "① AI予想":
     show_page1()
 elif selected_page == "② 勝敗入力":
