@@ -1,7 +1,7 @@
 # pages/page2_input_result.py
 
 import streamlit as st
-st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ✅ 一番最初に書く！
+st.set_page_config(page_title="② 勝敗入力", layout="centered")  # ← 必ず先頭に記述！
 
 import pandas as pd
 from datetime import datetime
