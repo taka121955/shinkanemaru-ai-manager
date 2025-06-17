@@ -1,7 +1,7 @@
 # pages/page3_statistics.py
 
 import streamlit as st
-st.set_page_config(page_title="③ 統計データ", layout="centered")  # ✅ 最上部に配置
+st.set_page_config(page_title="③ 統計データ", layout="centered")  # ✅ 一番最初に置く
 
 import pandas as pd
 
@@ -24,7 +24,6 @@ def show_page():
     hits = len(df[df["的中"] == "的中"])
     total_amount = df["金額"].sum()
     avg_bet = df["金額"].mean()
-
     hit_rate = round((hits / total_bets) * 100, 2)
 
     df["回収額"] = df.apply(lambda row: row["金額"] * 3 if row["予想"] == row["結果"] else 0, axis=1)
