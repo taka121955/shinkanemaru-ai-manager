@@ -2,33 +2,32 @@
 
 import streamlit as st
 import pandas as pd
+import os
 
-st.markdown("## 📖 結果履歴")
+# ✅ ページ設定（タイトルとレイアウト）
+st.set_page_config(page_title="④ 結果履歴", layout="centered")
 
-csv_path = "results.csv"
+def show_page():
+    st.title("📜 結果履歴")
 
-try:
-    df = pd.read_csv(csv_path)
+    st.markdown("#### 📄 過去に入力された勝敗データ一覧")
 
-    if df.empty:
-        st.info("まだ登録された記録がありません。")
-    else:
-        df_display = df.copy()
-        df_display.index += 1
-        df_display = df_display.rename_axis("No.")
-        df_display = df_display.rename(columns={
-            "日付": "🗓 日付",
-            "競艇場": "🚩 競艇場",
-            "式別": "📘 式別",
-            "投票内容": "✏️ 投票内容",
-            "賭け金": "💰 賭け金",
-            "的中": "🎯 的中",
-            "オッズ": "📈 オッズ",
-        })
+    # CSVファイル名
+    csv_path = "results.csv"
 
-        st.dataframe(df_display, use_container_width=True)
+    # ファイルが存在しない場合
+    if not os.path.exists(csv_path):
+        st.warning("📂 結果データ（results.csv）がまだ存在しません。")
+        st.info("勝敗入力ページからレース結果を登録すると、ここに一覧が表示されます。")
+        return
 
-except FileNotFoundError:
-    st.warning("結果ファイルが見つかりません。まだ登録されていない可能性があります。")
-except pd.errors.EmptyDataError:
-    st.warning("結果ファイルが空です。")
+    try:
+        # CSV読み込み
+        df = pd.read_csv(csv_path)
+
+        if df.empty:
+            st.info("📭 結果データはまだ登録されていません。")
+        else:
+            st.dataframe(df, use_container_width=True)
+    except Exception as e:
+        st.error(f"エラーが発生しました: {e}")
