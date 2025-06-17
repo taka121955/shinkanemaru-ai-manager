@@ -1,6 +1,6 @@
 import streamlit as st
-st.set_page_config(page_title="③ 統計データ", layout="centered")
+st.set_page_config(page_title="④ 結果履歴", layout="centered")
 
 def show_page():
-    st.title("③ 統計データ")
-    st.write("統計情報をここに表示します。")
+    st.title("④ 結果履歴")
+    st.write("過去の勝敗履歴を表示します。")
