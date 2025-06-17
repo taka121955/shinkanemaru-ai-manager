@@ -8,9 +8,9 @@ from pages.page4_record_result import show_page as show_page4
 from pages.page5_today_schedule import show_page as show_page5
 from pages.page6_settings import show_page as show_page6
 from pages.page7_per_boatplace_prediction import show_page as show_page7
-from pages.page8_today_result_summary import show_page as show_page8
+from pages.page8_summary_today import show_page as show_page8
 
-# ✅ Streamlitページ設定（必ず最初！）
+# ✅ Streamlitページ設定（最初のコマンド！）
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
 # ✅ サイドバーでページ切り替え
