@@ -1,50 +1,41 @@
-import pandas as pd
-from datetime import datetime
-import pytz
+# main.py
+
 import streamlit as st
+from pages.1_AI予想 import show_page as show_page1
+from pages.2_勝敗入力 import show_page as show_page2
+from pages.3_統計データ import show_page as show_page3
+from pages.4_結果履歴 import show_page as show_page4
+from pages.5_出走表 import show_page as show_page5
+from pages.6_設定 import show_page as show_page6
+from pages.page7_per_boatplace_prediction import show_page as show_page7
+from pages.page8_summary_today import show_page as show_page8
 
-# --- 現在時刻（日本時間） ---
-jst = pytz.timezone("Asia/Tokyo")
-now = datetime.now(jst).strftime("%Y/%m/%d %H:%M:%S")
-st.markdown(
-    f"<h3 style='text-align: center;'>🕰️ 現在時刻： {now}</h3>",
-    unsafe_allow_html=True
-)
+# ✅ ページ選択（サイドバー）
+selected_page = st.sidebar.radio("📑 ページ選択", [
+    "① AI予想",
+    "② 勝敗入力",
+    "③ 統計データ",
+    "④ 結果履歴",
+    "⑤ 出走表",
+    "⑥ 設定",
+    "⑦ 出走場別12R予想",
+    "⑧ 今日の結果まとめ"
+])
 
-# --- ステータス見出し ---
-st.markdown(
-    "<h4 style='text-align: center;'>💼 現在の資金ステータス</h4>",
-    unsafe_allow_html=True
-)
-
-# --- 現在の資金ステータス（2列×12行） ---
-status_data = [
-    ["🎯 目標金額", "10,000円", "🏆 勝率", "70%"],
-    ["💰 準備資金", "10,000円", "🎯 的中率", "85%"],
-    ["📊 積立資金", "0円", "💹 回収率", "125%"],
-    ["🧾 総収支", "+4,800円", "📅 計測日数", "15日"],
-    ["📈 開始日", "2025/06/01", "📋 ベット回数", "40回"],
-    ["🎯 的中回数", "23回", "📉 平均回収率", "121%"]
-]
-df_status = pd.DataFrame(status_data, columns=["項目①", "値①", "項目②", "値②"])
-st.dataframe(df_status, use_container_width=True)
-
-# --- メニュー見出し（やや小さめ） ---
-st.markdown(
-    "<h5 style='text-align: center;'>📋 メニュー一覧</h5>",
-    unsafe_allow_html=True
-)
-
-# --- メニュー（2行×3列） ---
-menu_data = [
-    ["① AI予想", "② 勝敗入力", "③ 統計データ"],
-    ["④ 結果履歴", "⑤ 開催結果", "⑥ 設定"]
-]
-df_menu = pd.DataFrame(menu_data, columns=["MENU①", "MENU②", "MENU③"])
-st.dataframe(df_menu, use_container_width=True)
-
-# --- 制作者名（下部に中央寄せ） ---
-st.markdown(
-    "<p style='text-align: center;'>制作者：小島崇彦</p>",
-    unsafe_allow_html=True
-)
+# ✅ 各ページを表示
+if selected_page == "① AI予想":
+    show_page1()
+elif selected_page == "② 勝敗入力":
+    show_page2()
+elif selected_page == "③ 統計データ":
+    show_page3()
+elif selected_page == "④ 結果履歴":
+    show_page4()
+elif selected_page == "⑤ 出走表":
+    show_page5()
+elif selected_page == "⑥ 設定":
+    show_page6()
+elif selected_page == "⑦ 出走場別12R予想":
+    show_page7()
+elif selected_page == "⑧ 今日の結果まとめ":
+    show_page8()
