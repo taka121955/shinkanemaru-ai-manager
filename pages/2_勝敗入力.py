@@ -1,6 +1,10 @@
 import streamlit as st
+import pandas as pd
 
-# 仮のAI予想データ（実際は読み込み）
+st.set_page_config(page_title="📝 勝敗入力フォーム", layout="wide")
+st.title("📝 勝敗入力フォーム（エクセル風）")
+
+# 仮のAI予想データ（実際は自動取得に切り替え予定）
 ai_predictions = [
     {"競艇場": "唐津", "レース番号": "12R", "式別": "2連単", "投票内容": "1-5", "的中率": "84%", "金額": 100},
     {"競艇場": "若松", "レース番号": "11R", "式別": "3連単", "投票内容": "4-5-6", "的中率": "82%", "金額": 100},
@@ -14,22 +18,26 @@ ai_predictions = [
     {"競艇場": "津",   "レース番号": "3R", "式別": "単勝", "投票内容": "2", "的中率": "73%", "金額": 100},
 ]
 
-st.title("📝 勝敗入力フォーム")
-番号 = st.selectbox("🎯 登録する予想番号　（①〜⑩）", list(range(10)), format_func=lambda x: f"{x+1}️⃣")
+# 結果の入力欄追加
+for i, row in enumerate(ai_predictions):
+    col1, col2, col3, col4, col5, col6, col7 = st.columns([1.2, 1, 1, 1.2, 1, 1, 1])
+    with col1: st.markdown(f"🏁 **{row['競艇場']}**")
+    with col2: st.markdown(f"{row['レース番号']}")
+    with col3: st.markdown(f"{row['式別']}")
+    with col4: st.markdown(f"🎯 {row['投票内容']}")
+    with col5: st.markdown(f"{row['的中率']}")
+    with col6: st.markdown(f"💴 {row['金額']}円")
+    with col7:
+        result = st.selectbox(
+            label="結果", 
+            options=["未入力", "的中", "不的中"], 
+            key=f"result_{i}", 
+            index=0
+        )
+        ai_predictions[i]["結果"] = result
 
-# 選ばれた予想データを取り出し
-選択 = ai_predictions[番号]
-
-# 表示部分
-st.markdown(f"🚩 **競艇場：{選択['競艇場']}**")
-st.markdown(f"📄 **レース番号：{選択['レース番号']}**")
-st.markdown(f"📘 式別：{選択['式別']}")
-st.markdown(f"✏️ 投票内容：{選択['投票内容']}")
-st.markdown(f"💰 自動賭け金（ECP方式）：<span style='color:green;'>{選択['金額']}円</span>", unsafe_allow_html=True)
-
-# 結果登録
-st.markdown("🎯 結果は？")
-結果 = st.radio("　", ["的中", "不的中"], horizontal=True)
-
-if st.button("✅ 登録する"):
-    st.success("登録が完了しました。")
+# 登録ボタン
+if st.button("✅ まとめて登録"):
+    df = pd.DataFrame(ai_predictions)
+    st.success("✅ 登録完了！")
+    st.dataframe(df)
