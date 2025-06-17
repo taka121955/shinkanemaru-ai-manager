@@ -1,18 +1,35 @@
-import pandas as pd
+# pages/page8_today_result_summary.py
+
 import streamlit as st
-from datetime import datetime
-from pandas.errors import EmptyDataError
+import pandas as pd
+from datetime import date
 
-st.title("📊 今日の結果まとめ")
+st.set_page_config(page_title="⑧ 本日の結果まとめ", layout="centered")
 
-try:
-    df = pd.read_csv("results.csv")
-    if df.empty:
-        st.warning("results.csv は空です。勝敗入力を先に行ってください。")
-    else:
-        # 通常処理へ進む（集計など）
-        ...
-except FileNotFoundError:
-    st.error("results.csv が見つかりません。")
-except EmptyDataError:
-    st.error("results.csv が空のため、読み込めません。")
+def show_page():
+    st.title("📅 本日の結果まとめ")
+
+    # 日付表示
+    today = date.today().strftime("%Y年%m月%d日（%a）")
+    st.markdown(f"### 🗓️ {today} の集計結果")
+
+    st.markdown("---")
+
+    # 仮の結果データ（あとでCSVやDB連携可能）
+    data = {
+        "競艇場": ["蒲郡", "住之江", "戸田", "丸亀"],
+        "的中レース数": [5, 3, 4, 6],
+        "ベット回数": [12, 12, 12, 12],
+        "的中率": ["41.7%", "25.0%", "33.3%", "50.0%"],
+        "総ベット金額": [3600, 3600, 3600, 3600],
+        "払戻金額": [5200, 2300, 3100, 6200],
+        "回収率": ["144.4%", "63.9%", "86.1%", "172.2%"]
+    }
+
+    df = pd.DataFrame(data)
+
+    st.dataframe(df, use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("📌 上記は当日全場の合計または会場別集計のサンプルです。")
+    st.markdown("✅ 実際のデータは勝敗入力ページと連動可能です（CSV/DB保存で拡張）。")
