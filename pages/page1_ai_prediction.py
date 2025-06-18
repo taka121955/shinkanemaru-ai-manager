@@ -2,24 +2,25 @@ import streamlit as st
 import pandas as pd
 
 def show_page():
+    # ✅ ページ設定（タイトルなど）
     st.set_page_config(page_title="① AI予想", layout="centered")
-    st.title("① AI予想")
 
-    # ✅ ヘッダー＆フッダー非表示CSS
+    # ✅ ヘッダー・フッター・余白を非表示にするCSS
     st.markdown("""
         <style>
-        /* ヘッダー（ハンバーガー＆Shareボタン等）非表示 */
         header {visibility: hidden;}
-        /* フッダー（Streamlitロゴ）非表示 */
         footer {visibility: hidden;}
-        /* bodyスクロール防止（画面固定） */
-        body {
-            overflow: hidden;
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # ✅ スプレッドシートCSV URL
+    # ✅ タイトル
+    st.title("① AI予想")
+
+    # ✅ GoogleスプレッドシートCSV URL（シート1）
     csv_url = "https://docs.google.com/spreadsheets/d/1yfzSSgqA-1x2z-MF7xKnCMbFBJvb-7Kq4c84XSmRROg/export?format=csv&gid=0"
 
     try:
@@ -30,4 +31,5 @@ def show_page():
         st.error("❌ データの読み込みに失敗しました。")
         st.code(str(e))
 
+# ✅ この関数を実行
 show_page()
