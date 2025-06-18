@@ -5,7 +5,21 @@ def show_page():
     st.set_page_config(page_title="① AI予想", layout="centered")
     st.title("① AI予想")
 
-    # ✅ スプレッドシートCSV URL（シート1）
+    # ✅ ヘッダー＆フッダー非表示CSS
+    st.markdown("""
+        <style>
+        /* ヘッダー（ハンバーガー＆Shareボタン等）非表示 */
+        header {visibility: hidden;}
+        /* フッダー（Streamlitロゴ）非表示 */
+        footer {visibility: hidden;}
+        /* bodyスクロール防止（画面固定） */
+        body {
+            overflow: hidden;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # ✅ スプレッドシートCSV URL
     csv_url = "https://docs.google.com/spreadsheets/d/1yfzSSgqA-1x2z-MF7xKnCMbFBJvb-7Kq4c84XSmRROg/export?format=csv&gid=0"
 
     try:
