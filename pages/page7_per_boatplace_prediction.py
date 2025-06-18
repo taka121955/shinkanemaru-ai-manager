@@ -1,22 +1,38 @@
 import streamlit as st
 import pandas as pd
+from datetime import datetime
+
+# Googleスプレッドシートのシート2（AI予想一覧）URL（CSV形式）
+CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOvDnRZFO5SRIubHRTYOfEovEtKD-JJUDT1aymSssv6I7Rh4Km4S4KpR4I0gAIzGE0XMcc8c3Edh-s/pub?gid=1462109758&single=true&output=csv"
 
 def show_page():
-    st.markdown("## ⑦ 出走場別12R予想 🐎")
+    st.set_page_config(page_title="⑦ 全レース予想", layout="centered")
+    st.title("⑦ 本日の全レースAI予想")
 
-    st.markdown("### 📅 本日の12Rレース予想（AI選定）")
+    now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    st.markdown(f"🕒 現在時刻（日本時間）： `{now}`")
 
-    # 仮データ（例）
-    data = {
-        "競馬場": ["東京", "京都", "中山", "阪神", "札幌"],
-        "レース番号": [12, 12, 12, 12, 12],
-        "式別": ["単勝", "3連複", "馬連", "ワイド", "3連単"],
-        "買い目": ["5", "3-5-8", "4-7", "2-6", "1-3-6"],
-        "金額": ["1000円", "600円", "800円", "500円", "1000円"],
-        "的中確率": ["82%", "67%", "74%", "71%", "69%"]
-    }
+    try:
+        df = pd.read_csv(CSV_URL)
 
-    df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True)
+        st.subheader("📋 すべてのAI予想")
+        st.dataframe(df, use_container_width=True)
 
-    st.markdown("※ 上記はAIによる簡易予想です（参考用）")
+        st.subheader("🏆 的中率トップ10")
+        df_sorted = df.copy()
+        df_sorted["的中率"] = df_sorted["的中率"].str.replace("%", "").astype(float)
+        df_sorted = df_sorted.sort_values(by="的中率", ascending=False).head(10)
+
+        df_sorted.insert(0, "番号", range(1, 11))  # 番号1〜10を自動で付与
+        st.table(df_sorted)
+
+        # 🔽 ページ①用に保存（番号付き上位10件のみ）
+        df_sorted.to_csv("ai_predictions.csv", index=False)
+
+        st.success("ページ①用の上位10件データを保存しました ✅")
+
+    except Exception as e:
+        st.error(f"データの取得に失敗しました：{e}")
+
+# 最後に必ず呼び出し
+show_page()
