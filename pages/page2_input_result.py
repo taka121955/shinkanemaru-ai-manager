@@ -1,30 +1,49 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import pytz
-from utils.calc_ecp import calculate_ecp_amount  # 正しい相対パスに注意
-
-def get_japan_time():
-    jst = pytz.timezone("Asia/Tokyo")
-    return datetime.now(jst).strftime("%Y/%m/%d %H:%M:%S")
+from utils.calc_ecp import calc_ecp  # ECP方式の自動計算
 
 def show_page():
-    st.set_page_config(page_title="② 勝敗入力", layout="centered")
-    st.title("② 勝敗入力")
+    st.title("② 勝敗入力 📝")
 
-    now = get_japan_time()
-    st.markdown(f"🕒 現在時刻（日本時間）： `{now}`")
+    st.markdown("#### 📅 日付とレース情報の入力")
 
-    st.subheader("🎲 勝敗結果の入力")
+    today = datetime.now().date()
+    date = st.date_input("開催日", value=today)
+    place = st.text_input("競艇場名", placeholder="例：唐津")
+    race = st.text_input("レース番号", placeholder="例：12R")
 
-    # 選択肢
-    venue = st.selectbox("競艇場", ["唐津", "住之江", "若松", "丸亀", "児島"])
-    race_no = st.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
-    result = st.radio("結果", ["的中", "外れ"])
+    st.markdown("---")
+    st.markdown("#### 🎯 結果の入力")
 
-    # ECP計算金額の表示
-    amount = calculate_ecp_amount(result_type=result)
-    st.success(f"💰 次回の自動賭け金額（ECP）: {amount}円")
+    result = st.radio("勝敗", ["的中", "不的中"])
+    odds = st.number_input("オッズ", min_value=1.0, step=0.1)
+    
+    # ECP方式の金額自動指示
+    st.markdown("#### 💰 ベット金額（ECP方式で自動計算）")
+    selected_mode = st.radio("資金モード", ["1300円", "3900円", "10000円"], horizontal=True)
+    ecp_values = calc_ecp(selected_mode)
+    st.write("自動ベット金額：", ecp_values)
 
-    if st.button("記録する"):
-        st.info("✅ 勝敗データを保存しました（仮機能）")
+    if st.button("登録する"):
+        new_record = {
+            "日付": date.strftime("%Y-%m-%d"),
+            "競艇場": place,
+            "レース": race,
+            "勝敗": result,
+            "オッズ": odds,
+            "資金モード": selected_mode,
+            "ECP金額": ecp_values
+        }
+
+        try:
+            df = pd.read_csv("results.csv")
+            df = pd.concat([df, pd.DataFrame([new_record])], ignore_index=True)
+        except FileNotFoundError:
+            df = pd.DataFrame([new_record])
+
+        df.to_csv("results.csv", index=False)
+        st.success("✅ 登録が完了しました！")
+
+# 呼び出し
+show_page()
