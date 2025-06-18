@@ -1,5 +1,4 @@
 import streamlit as st
-from utils.calc_ecp import calculate_ecp_amount
 
 def show_page():
     st.markdown("## ② 勝敗入力")
@@ -15,19 +14,16 @@ def show_page():
 
     fund_mode = st.radio("資金モード", ["1300円", "3900円", "10000円"])
 
-    # 自動金額計算（第1波のみ表示）
+    # 指示金額（1波のみ）
     ecp_map = {
-        "1300円": [100, 300, 900],
-        "3900円": [300, 900, 2700],
-        "10000円": [1300, 2600, 6100]
+        "1300円": 100,
+        "3900円": 300,
+        "10000円": 1300
     }
 
     if fund_mode in ecp_map:
-        try:
-            amount = ecp_map[fund_mode][0]  # 第1波のみ
-            st.markdown(f"🧮 **自動ベット金額（AI指示）**  \n 👉 指示金額：**:green[{amount}円]**（ECP第1波）")
-        except Exception as e:
-            st.error("ベット金額の計算に失敗しました。")
+        amount = ecp_map[fund_mode]
+        st.markdown(f"🧮 **自動ベット金額（AI指示）**  \n 👉 指示金額：**:green[{amount}円]**（ECP第1波）")
     else:
         st.warning("資金モードを選択してください。")
 
