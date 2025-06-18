@@ -15,12 +15,16 @@ def show_page():
     with st.spinner("開催中の競艇場を確認中..."):
         places = get_today_boat_places()
 
-    if not places:
+    if not places or not isinstance(places, list):
         st.warning("⚠️ 本日開催中の競艇場データを取得できませんでした。")
         return
 
     # プルダウンで競艇場選択
-    options = {name: code for code, name in places}
+    options = {name: code for code, name in places if name and code}
+    if not options:
+        st.warning("⚠️ 競艇場選択肢の生成に失敗しました。")
+        return
+
     selected_place_name = st.selectbox("🏟️ 競艇場を選択", list(options.keys()))
     selected_code = options[selected_place_name]
 
@@ -28,7 +32,7 @@ def show_page():
     with st.spinner(f"{selected_place_name} の出走表を取得中..."):
         all_races = get_race_data(selected_code)
 
-    if not all_races:
+    if not all_races or not isinstance(all_races, list):
         st.error("❌ 出走表の取得に失敗しました。")
         return
 
@@ -36,6 +40,8 @@ def show_page():
 
     # 各レースの出走表を1つのテーブルとして順番に表示
     for df in all_races:
+        if df is None or df.empty or "レース" not in df.columns:
+            continue
         rno = int(df.iloc[0]["レース"]) if not df.empty else None
         if rno:
             st.markdown(f"#### 🎯 {rno}R 出走表")
