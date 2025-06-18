@@ -1,7 +1,12 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-from utils.calc_ecp import calculate_ecp_amount  # 修正済みのインポート
+import os
+import sys
+
+# 🔧 utils フォルダの calc_ecp を読み込むためのパス追加
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils')))
+from calc_ecp import calculate_ecp_amount
 
 def show_page():
     st.set_page_config(page_title="② 勝敗入力", layout="centered")
@@ -10,34 +15,43 @@ def show_page():
     now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     st.markdown(f"🕒 現在時刻（日本時間）： `{now}`")
 
-    st.markdown("---")
-    st.markdown("### 🎯 対象レースを選択して結果を入力してください")
+    st.markdown("### 🎯 勝敗結果を入力")
 
-    # 仮のAI予想データ（①ページのトップ10と連携する前提）
-    predictions = [
-        {"番号": 1, "競艇場": "唐津", "レース": "1R", "式別": "2連単", "内容": "5-2", "的中率": "89%"},
-        {"番号": 2, "競艇場": "住之江", "レース": "3R", "式別": "3連単", "内容": "6-3-3", "的中率": "82%"},
-        {"番号": 3, "競艇場": "若松", "レース": "2R", "式別": "2連単", "内容": "1-6", "的中率": "70%"},
-    ]
+    # 勝敗データの入力欄
+    number = st.selectbox("番号（AI予想の番号）", list(range(1, 11)))
+    result = st.radio("結果", ["的中", "外れ"])
+    wave = st.selectbox("波（第何波）", [1, 2, 3])
 
-    options = [f"{p['番号']}: {p['競艇場']} {p['レース']} {p['内容']}" for p in predictions]
-    selected = st.selectbox("🎯 番号を選択", options)
+    # 金丸法ECPによる金額の自動計算
+    try:
+        amount = calculate_ecp_amount(wave)
+        st.success(f"💰 金額（自動計算）：{amount:,}円")
+    except Exception as e:
+        st.error(f"金額の計算に失敗しました：{e}")
+        amount = 0
 
-    if selected:
-        selected_index = int(selected.split(":")[0]) - 1
-        target = predictions[selected_index]
+    # 登録ボタン
+    if st.button("✅ 登録"):
+        new_data = {
+            "時刻": now,
+            "番号": number,
+            "結果": result,
+            "波": wave,
+            "金額": amount
+        }
 
-        st.write(f"### 対象：{target['競艇場']} {target['レース']}（{target['内容']}）")
+        try:
+            csv_path = "results.csv"
+            if os.path.exists(csv_path):
+                df = pd.read_csv(csv_path)
+                df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
+            else:
+                df = pd.DataFrame([new_data])
 
-        result = st.radio("🎲 結果", ["的中", "不的中", "未実施"], horizontal=True)
-
-        if result in ["的中", "不的中"]:
-            # 金丸法×ECPの自動金額指示
-            auto_amount = calculate_ecp_amount(result == "的中", previous_losses=0)
-            st.success(f"💰 自動指示金額：{auto_amount} 円")
-
-        if st.button("✅ 登録する"):
-            st.success("結果を保存しました（※データベース接続は仮）")
+            df.to_csv(csv_path, index=False)
+            st.success("記録しました！")
+        except Exception as e:
+            st.error(f"保存に失敗しました：{e}")
 
 # 呼び出し
 show_page()
