@@ -9,8 +9,15 @@ def show_page():
         df = pd.read_csv("ai_predictions.csv")
         df["番号"] = df["番号"].astype(int)
     except Exception as e:
-        st.error(f"❌ AI予想データの読み込みに失敗しました：{e}")
-        return
+        st.warning("⚠️ データが見つからないため、仮のデータを表示します")
+        df = pd.DataFrame({
+            "番号": [1, 2, 3],
+            "競艇場": ["唐津", "住之江", "若松"],
+            "レース番号": ["1R", "3R", "2R"],
+            "式別": ["2連単", "3連単", "2連単"],
+            "投票内容": ["5-2", "6-3-3", "1-6"],
+            "的中率": ["89.0%", "82.0%", "70.0%"]
+        })
 
     # 🔢 番号選択（ページ①と連動）
     selected_number = st.radio("🔢 番号を選択（ページ①と連動）", df["番号"].tolist())
@@ -24,7 +31,7 @@ def show_page():
     betting_type = row["式別"]
     betting_content = row["投票内容"]
     raw_accuracy = float(row["的中率"].replace("%", ""))
-    estimated_odds = max(round(10.0 / raw_accuracy, 2), 1.5)  # 的中率 → オッズ換算（最低1.5）
+    estimated_odds = max(round(10.0 / raw_accuracy, 2), 1.5)
 
     # 📋 入力フォーム（自動表示）
     st.text_input("🎡 競艇場名", value=venue, disabled=True)
