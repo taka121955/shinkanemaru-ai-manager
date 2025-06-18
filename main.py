@@ -1,43 +1,46 @@
-# main.py
-
 import streamlit as st
-import datetime
-import pandas as pd
+from datetime import datetime
+import pytz
 
-# -----------------------------
-# 📅 曜日＋現在時刻（上部中央）
-# -----------------------------
-now = datetime.datetime.now()
-weekday_jp = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"][now.weekday()]
-hour_minute = now.strftime("%H:%M")
-full_datetime = now.strftime("%Y/%m/%d %H:%M:%S")
+# ページ設定
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-st.markdown(f"<h2 style='text-align:center'>{weekday_jp}</h2>", unsafe_allow_html=True)
-st.markdown(f"<h3 style='text-align:center'>{hour_minute}</h3>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align:center'>🕰️ 現在時刻：{full_datetime}</p>", unsafe_allow_html=True)
+# ===== 🕒 日本時間の現在時刻を中央表示 =====
+japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
+formatted_time = japan_time.strftime("%Y年%m月%d日（%a） %H:%M")
 
-# -----------------------------
-# 💼 資金ステータス（小さめタイトル）
-# -----------------------------
-st.markdown("### <span style='font-size:20px'>💼 現在の資金ステータス</span>", unsafe_allow_html=True)
+st.markdown(f"<h2 style='text-align: center;'>{formatted_time}</h2>", unsafe_allow_html=True)
+st.markdown("---")
 
-# 表：項目①／値①／項目②／値② の4列構成
-status_df = pd.DataFrame({
-    "項目①": ["🎯 目標金額", "💰 準備資金", "📊 積立資金", "🧾 総収支", "📈 開始日"],
-    "値①": ["10,000円", "10,000円", "0円", "+4,800円", "2025/06/01"],
-    "項目②": ["🏆 勝率", "🎯 的中率", "✅ 回収率", "📅 計測日数", "📋 ベット回数"],
-    "値②": ["70%", "85%", "125%", "15日", "40回"]
-})
-st.table(status_df)
+# ===== 📊 今日のステータス 表示 =====
+st.markdown("### 📊 今日のステータス")
 
-# -----------------------------
-# 📁 メニュー一覧（表形式・整列済）
-# -----------------------------
-st.markdown("## 📁 メニュー一覧", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown("🎯 的中率：85%")
+    st.markdown("📈 勝敗：3勝2敗")
+    st.markdown("💰 積立金：+4,800円")
+with col2:
+    st.markdown("🏆 勝率：70%")
+    st.markdown("💹 回収率：125%")
+    st.markdown("🎒 軍資金：10,000円")
 
-menu_df = pd.DataFrame({
-    "MENU①": ["① AI予想", "④ 結果履歴"],
-    "MENU②": ["② 勝敗入力", "⑤ 開催結果"],
-    "MENU③": ["③ 統計データ", "⑥ 設定"]
-})
-st.table(menu_df)
+st.markdown("---")
+
+# ===== 📁 メニュー一覧（装飾のみ） =====
+st.markdown("### 📁 メニュー一覧")
+
+menu_labels = [
+    "① AI予想 🧠", "② 勝敗入力 ✍️", "③ 統計データ 📊",
+    "④ 結果履歴 📁", "⑤ 開催結果 🏁", "⑥ 設定 ⚙️",
+    "⑦ 場別予想 🏟️", "⑧ 総合評価 📊", "⑨ 特別分析 💡"
+]
+
+for i in range(0, 9, 3):
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"<div style='text-align: center; font-size:20px;'>{menu_labels[i]}</div>", unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"<div style='text-align: center; font-size:20px;'>{menu_labels[i+1]}</div>", unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"<div style='text-align: center; font-size:20px;'>{menu_labels[i+2]}</div>", unsafe_allow_html=True)
