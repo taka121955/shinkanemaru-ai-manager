@@ -1,27 +1,42 @@
+# pages/page5_boat_results.py
+
 import streamlit as st
-import pandas as pd
 import datetime
+from utils.scraper_boatrace import get_today_boat_places, get_race_data
 
 def show_page():
     st.markdown("## ⑤ 出走表 🏁")
 
-    # 日付選択（デフォルトは今日）
+    # 本日の日付（固定）
     today = datetime.date.today()
-    selected_date = st.date_input("📅 表示する日付を選択", value=today)
+    st.markdown(f"### 📅 本日：{today.strftime('%Y年%m月%d日')}")
 
-    # 仮のデータ（サンプル用）
-    race_data = {
-        "競艇場": ["住之江", "蒲郡", "若松", "丸亀", "児島", "唐津"],
-        "レース番号": [1, 2, 3, 4, 5, 6],
-        "出走時間": ["15:10", "15:35", "16:00", "16:25", "16:50", "17:15"],
-        "1号艇": ["A選手", "B選手", "C選手", "D選手", "E選手", "F選手"],
-        "2号艇": ["G選手", "H選手", "I選手", "J選手", "K選手", "L選手"],
-        "3号艇": ["M選手", "N選手", "O選手", "P選手", "Q選手", "R選手"]
-    }
+    # 本日開催中の競艇場を取得
+    with st.spinner("開催中の競艇場を確認中..."):
+        places = get_today_boat_places()
 
-    df_race = pd.DataFrame(race_data)
+    if not places:
+        st.warning("⚠️ 本日開催中の競艇場データを取得できませんでした。")
+        return
 
-    st.markdown(f"### 📅 {selected_date} の出走表")
-    st.dataframe(df_race, use_container_width=True)
+    # プルダウンで競艇場選択
+    options = {name: code for code, name in places}
+    selected_place_name = st.selectbox("🏟️ 競艇場を選択", list(options.keys()))
+    selected_code = options[selected_place_name]
 
-    st.caption("※ 実際のデータ取得は今後自動連携予定（現在はサンプル表示）")
+    # 出走表取得
+    with st.spinner(f"{selected_place_name} の出走表を取得中..."):
+        all_races = get_race_data(selected_code)
+
+    if not all_races:
+        st.error("❌ 出走表の取得に失敗しました。")
+        return
+
+    st.markdown(f"### 🚤 {selected_place_name} の出走表（全12R）")
+
+    # 各レースの出走表を1つのテーブルとして順番に表示
+    for df in all_races:
+        rno = int(df.iloc[0]["レース"]) if not df.empty else None
+        if rno:
+            st.markdown(f"#### 🎯 {rno}R 出走表")
+            st.dataframe(df, use_container_width=True)
