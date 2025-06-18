@@ -23,3 +23,6 @@ def show_page():
 
     st.markdown("### 🔟 本日のAI予想一覧")
     st.table(df)
+
+# ✅ 最後にこの1行を追加
+show_page()
