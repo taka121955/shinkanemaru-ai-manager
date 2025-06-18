@@ -12,9 +12,8 @@ formatted_time = japan_time.strftime("%Y年%m月%d日（%a） %H:%M")
 st.markdown(f"<h2 style='text-align: center; font-size: 24px;'>{formatted_time}</h2>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== 📊 ステータス表を中央表示（Excel風） =====
+# ===== 📊 ステータス（中央表示） =====
 st.markdown("<h3 style='text-align: center;'>📊 今日のステータス</h3>", unsafe_allow_html=True)
-
 status_html = """
 <div style='display: flex; justify-content: center;'>
   <table style='font-size:18px; border-spacing: 16px;'>
@@ -30,7 +29,7 @@ status_html = """
 st.markdown(status_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== 📁 メニュー一覧（ボタン風に装飾） =====
+# ===== 📁 メニュー一覧（同サイズボタン） =====
 st.markdown("<h3 style='text-align: center;'>📁 メニュー一覧</h3>", unsafe_allow_html=True)
 
 menu_list = [
@@ -39,26 +38,29 @@ menu_list = [
     "⑦ 場別予想 🏟️", "⑧ 総合評価 📊", "⑨ 特別分析 💡"
 ]
 
-# メニュー表示（3列×3行、囲い付きボタン風）
+button_style = """
+display: inline-block;
+background-color: #f1f3f6;
+border: 2px solid #ccc;
+border-radius: 10px;
+padding: 18px 0;
+margin: 10px;
+font-size: 18px;
+font-weight: bold;
+text-align: center;
+width: 180px;
+height: 60px;
+"""
+
 for i in range(0, 9, 3):
     cols = st.columns(3)
     for j in range(3):
         with cols[j]:
-            st.markdown(f"""
-            <div style='
-                display: inline-block;
-                background-color: #f1f3f6;
-                border: 2px solid #ccc;
-                border-radius: 10px;
-                padding: 12px 18px;
-                margin: 10px;
-                font-size: 18px;
-                font-weight: bold;
-                text-align: center;
-                width: 160px;
-            '>{menu_list[i+j]}</div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f"<div style='{button_style}'>{menu_list[i+j]}</div>",
+                unsafe_allow_html=True
+            )
 
-# 制作者表記（下部中央）
+# ===== 👤 制作者表記 =====
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center; font-size: 14px;'>制作：小島崇彦</div>", unsafe_allow_html=True)
