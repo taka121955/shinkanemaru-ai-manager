@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 import sys
 
-# ✅ 正しいパスを追加して utils を認識させる
+# ✅ utils ディレクトリをパスに追加
 current_dir = os.path.dirname(os.path.abspath(__file__))
 utils_path = os.path.abspath(os.path.join(current_dir, "..", "utils"))
 if utils_path not in sys.path:
