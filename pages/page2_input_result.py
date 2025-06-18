@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import sys
+import os
 
-# ✅ 正しいモジュールパスでインポート（utils付き）
-from utils.calc_ecp import calculate_ecp_amounts
+# ✅ モジュールパスに 'utils' を追加（Streamlit Cloud対策）
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "utils"))
+from calc_ecp import calculate_ecp_amounts
 
 def show_page():
     st.set_page_config(page_title="② 勝敗入力", layout="centered")
