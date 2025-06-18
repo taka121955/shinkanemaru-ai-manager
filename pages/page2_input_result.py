@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 import sys
 
-# ECP計算モジュールを読み込み
+# ✅ utils内のECP計算モジュールを読み込む
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from calc_ecp import calculate_ecp_amounts
 
@@ -12,54 +12,57 @@ def show_page():
     st.set_page_config(page_title="② 勝敗入力", layout="centered")
     st.title("② 勝敗入力")
 
-    # データ取得（①のスプレッドシート）
-    csv_url = "https://docs.google.com/spreadsheets/d/1yfzSSgqA-1x2z-MF7xKnCMbFBJvb-7Kq4c84XSmRROg/export?format=csv&gid=1462109758"
+    # ✅ CSVファイル名
+    csv_file = "results.csv"
+
+    st.subheader("📅 日付・レース情報")
+
+    today = datetime.today().strftime("%Y/%m/%d")
+    selected_date = st.date_input("日付", value=pd.to_datetime(today), key="date")
+
+    selected_place = st.selectbox("競艇場名", ["唐津", "若松", "住之江", "丸亀", "児島", "徳山", "平和島", "蒲郡"])
+    selected_race = st.selectbox("レース番号", [f"{i}R" for i in range(1, 13)])
+
+    bet_type = st.selectbox("🎯 式別", ["単勝", "2連複", "2連単", "3連複", "3連単"])
+
+    st.subheader("🎲 投票内容")
+    col1, col2, col3 = st.columns(3)
+    first = col1.selectbox("1着", ["", "1", "2", "3", "4", "5", "6"])
+    second = col2.selectbox("2着", ["", "1", "2", "3", "4", "5", "6"])
+    third = col3.selectbox("3着", ["", "1", "2", "3", "4", "5", "6"])
+
+    result = st.radio("✅ 結果", ["的中", "外れ"])
+
+    # ✅ 自動金額（ECP金丸法）
     try:
-        df = pd.read_csv(csv_url)
-        df["的中率"] = df["的中率"].str.replace("%", "").astype(float)
-        df_sorted = df.sort_values(by="的中率", ascending=False).head(10).reset_index(drop=True)
+        amounts = calculate_ecp_amounts(mode="1300")
+        bet_amount = sum(amounts)
+        st.info(f"💴 賭け金額（ECP法）： {bet_amount} 円")
     except Exception as e:
-        st.error(f"データ取得に失敗しました：{e}")
-        return
+        st.error(f"ECP金額計算に失敗しました：{e}")
+        bet_amount = 0
 
-    # 番号選択（1〜10）
-    st.markdown("### 🔢 ページ①で選んだ番号を選択")
-    番号 = st.selectbox("番号を選択", options=list(range(1, 11)))
-
-    # 番号に該当するデータ取得
-    selected = df_sorted.iloc[番号 - 1]
-
-    # 結果（ラジオボタン）
-    st.markdown("### 🎯 勝敗を選択")
-    結果 = st.radio("的中 or 外れ", ["的中", "外れ"], horizontal=True)
-
-    # 時刻・金額（ECP方式：第一波）
-    now = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-    賭け金 = calculate_ecp_amounts(100)[0]  # 第一波100円基準
-
-    # 保存処理
-    if st.button("✅ 登録"):
+    if st.button("保存"):
+        vote = "-".join(filter(None, [first, second, third]))
         new_data = {
-            "日時": now,
-            "番号": 番号,
-            "競艇場": selected["競艇場"],
-            "レース番号": selected["レース番号"],
-            "式別": selected["式別"],
-            "投票内容": selected["投票内容"],
-            "的中率": selected["的中率"],
-            "結果": 結果,
-            "金額": 賭け金
+            "日付": selected_date.strftime("%Y/%m/%d"),
+            "競艇場": selected_place,
+            "レース": selected_race,
+            "式別": bet_type,
+            "投票内容": vote,
+            "金額": bet_amount,
+            "結果": result
         }
 
-        result_path = "results.csv"
-        if os.path.exists(result_path):
-            df_old = pd.read_csv(result_path)
-            df_new = pd.concat([df_old, pd.DataFrame([new_data])], ignore_index=True)
+        # 既存CSVがあれば読み込み・追加、なければ新規作成
+        if os.path.exists(csv_file):
+            df = pd.read_csv(csv_file)
+            df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
         else:
-            df_new = pd.DataFrame([new_data])
+            df = pd.DataFrame([new_data])
 
-        df_new.to_csv(result_path, index=False)
-        st.success("記録を保存しました ✅")
+        df.to_csv(csv_file, index=False, encoding="utf-8-sig")
+        st.success("✅ 勝敗結果を保存しました！")
 
-# ページ実行
+# 🔁 実行
 show_page()
