@@ -1,22 +1,23 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import sys
-import os
 
-# ✅ utilsディレクトリをパスに追加してからインポート
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "utils"))
-from calc_ecp import calculate_ecp_amounts
+# ✅ 正しいモジュールパスでインポート（utils付き）
+from utils.calc_ecp import calculate_ecp_amounts
 
 def show_page():
     st.set_page_config(page_title="② 勝敗入力", layout="centered")
     st.title("② 勝敗入力")
 
-    # ✅ データ取得（Googleスプレッドシート）
-    csv_url = "https://docs.google.com/spreadsheets/d/1yfzSSgqA-1x2z-MF7xKnCMbFBJvb-7Kq4c84XSmRROg/export?format=csv&gid=1462109758"
+    # ⏰ 現在時刻（日本時間）
+    jst_now = datetime.utcnow().astimezone().strftime("%Y/%m/%d %H:%M:%S")
+    st.markdown(f"🕒 現在時刻（日本時間）： `{jst_now}`")
 
     try:
+        # 📥 Googleスプレッドシートのシート2（全AI予想）
+        csv_url = "https://docs.google.com/spreadsheets/d/1yfzSSgqA-1x2z-MF7xKnCMbFBJvb-7Kq4c84XSmRROg/export?format=csv&gid=1462109758"
         df = pd.read_csv(csv_url)
+
         df["的中率"] = df["的中率"].str.replace("%", "").astype(float)
         df_sorted = df.sort_values(by="的中率", ascending=False).head(10).reset_index(drop=True)
         df_sorted.index += 1
@@ -41,7 +42,7 @@ def show_page():
             st.success("記録が保存されました！（仮）")
 
     except Exception as e:
-        st.error(f"データの取得または表示に失敗しました：{e}")
+        st.error(f"データ取得または処理に失敗しました：{e}")
 
 # 実行
 show_page()
