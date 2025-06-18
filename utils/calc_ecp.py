@@ -1,11 +1,6 @@
-# utils/calc_ecp.py
-
-def calculate_ecp_amount(wave):
-    if wave == 1:
+def calculate_ecp_amount(result_type="外れ"):
+    # 仮のECP金額ロジック
+    if result_type == "的中":
         return 100
-    elif wave == 2:
-        return 300
-    elif wave == 3:
-        return 900
     else:
-        return 0
+        return 300  # 外れ時にベット額増加（例）
