@@ -41,3 +41,6 @@ def show_page():
             st.success(f"{selected_place} {selected_race} を記録しました ✅")
     else:
         st.warning("①のデータ（`ai_predictions.csv`）が見つからないか、読み込みに失敗しました。")
+
+# ✅ 最後にこの1行を追加！
+show_page()
