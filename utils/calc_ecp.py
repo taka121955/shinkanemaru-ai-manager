@@ -1,6 +1,10 @@
-def calculate_ecp_amount(result_type="外れ"):
-    # 仮のECP金額ロジック
-    if result_type == "的中":
-        return 100
+def calc_ecp(mode):
+    # 例：資金モードに応じたベット金額分配
+    if mode == "1300円":
+        return [100, 300, 900]
+    elif mode == "3900円":
+        return [300, 900, 2700]
+    elif mode == "10000円":
+        return [1000, 3000, 6000]
     else:
-        return 300  # 外れ時にベット額増加（例）
+        return [0, 0, 0]
