@@ -1,26 +1,15 @@
 # main.py
-
 import streamlit as st
 import datetime
 import pandas as pd
 
-# ページ関数読み込み
-from pages.page1_ai_prediction import show_page as show_page1
-from pages.page2_input_result import show_page as show_page2
-from pages.page3_statistics import show_page as show_page3
-from pages.page4_record_result import show_page as show_page4
-from pages.page5_today_schedule import show_page as show_page5
-from pages.page6_settings import show_page as show_page6
-from pages.page7_per_boatplace_prediction import show_page as show_page7
-from pages.page8_summary_today import show_page as show_page8
-
-# 📅 日付と時刻
+# 📅 日付と現在時刻
 now = datetime.datetime.now()
-weekday = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"][now.weekday()]
+weekday_jp = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"][now.weekday()]
 today_str = now.strftime("%Y/%m/%d %H:%M:%S")
 
-# ⏱️ ヘッダー表示
-st.markdown(f"<h3 style='text-align:center'>{weekday}</h3>", unsafe_allow_html=True)
+# 🕒 曜日＋現在時刻（中央揃え）
+st.markdown(f"<h3 style='text-align:center'>{weekday_jp}</h3>", unsafe_allow_html=True)
 st.markdown(f"<h4 style='text-align:center'>🕰️ 現在時刻：{today_str}</h4>", unsafe_allow_html=True)
 
 # 💼 資金ステータス
@@ -34,27 +23,12 @@ status_df = pd.DataFrame({
 })
 st.table(status_df)
 
-# 🎮 メニュー
-st.markdown("## 📂 メニュー選択")
+# 📁 メニュー一覧 表形式で中央表示
+st.markdown("## 📁 メニュー一覧", unsafe_allow_html=True)
 
-menu = st.radio("選択してください", [
-    "① AI予想", "② 勝敗入力", "③ 統計データ", "④ 結果履歴",
-    "⑤ 出走表", "⑥ 設定", "⑦ 競艇場別予想", "⑧ 本日のまとめ"
-])
-
-if menu == "① AI予想":
-    show_page1()
-elif menu == "② 勝敗入力":
-    show_page2()
-elif menu == "③ 統計データ":
-    show_page3()
-elif menu == "④ 結果履歴":
-    show_page4()
-elif menu == "⑤ 出走表":
-    show_page5()
-elif menu == "⑥ 設定":
-    show_page6()
-elif menu == "⑦ 競艇場別予想":
-    show_page7()
-elif menu == "⑧ 本日のまとめ":
-    show_page8()
+menu_df = pd.DataFrame({
+    "MENU①": ["① AI予想", "④ 結果履歴"],
+    "MENU②": ["② 勝敗入力", "⑤ 開催結果"],
+    "MENU③": ["③ 統計データ", "⑥ 設定"]
+})
+st.table(menu_df)
