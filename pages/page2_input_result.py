@@ -1,15 +1,18 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import sys
+import os
 
-# ✅ calc_ecp を utils から読み込む
-from utils.calc_ecp import calculate_ecp_amounts
+# ✅ utilsディレクトリをパスに追加してからインポート
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "utils"))
+from calc_ecp import calculate_ecp_amounts
 
 def show_page():
     st.set_page_config(page_title="② 勝敗入力", layout="centered")
     st.title("② 勝敗入力")
 
-    # ✅ データ取得（シート2から）
+    # ✅ データ取得（Googleスプレッドシート）
     csv_url = "https://docs.google.com/spreadsheets/d/1yfzSSgqA-1x2z-MF7xKnCMbFBJvb-7Kq4c84XSmRROg/export?format=csv&gid=1462109758"
 
     try:
@@ -25,7 +28,6 @@ def show_page():
 
         st.markdown(f"**🏁 {selected_row['競艇場']} {selected_row['レース番号']} | {selected_row['式別']} | {selected_row['投票内容']}**")
 
-        # ✅ ECP方式に基づく自動金額算出
         total_fund = st.number_input("💰 初期資金（円）", min_value=1000, step=1000, value=10000)
         bet_amounts = calculate_ecp_amounts(total_fund)
 
