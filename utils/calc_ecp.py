@@ -1,14 +1,22 @@
 # utils/calc_ecp.py
-def calculate_ecp_amount(result: str, odds: float, fund: int) -> int:
+
+def calculate_ecp_amount(result, odds, fund):
+    """
+    ECP方式（簡略）でベット金額を1つだけ算出。
+    result: "的中" または "不的中"
+    odds: オッズ（float）
+    fund: 総資金（int）
+    """
+
     if result == "的中":
-        return 100  # 的中時は100円固定ベットなど
+        return 0  # 的中後は次ベットなし（または任意処理）
+    
+    # 初期ベット金額（例：資金に応じて変化）
+    if fund == 1300:
+        return 100
+    elif fund == 3900:
+        return 300
+    elif fund == 10000:
+        return 500
     else:
-        # 不的中時：段階に応じた再計算（例）
-        if fund == 1300:
-            return 300
-        elif fund == 3900:
-            return 900
-        elif fund == 10000:
-            return 1500
-        else:
-            return 100
+        return 0  # 想定外の資金の場合
