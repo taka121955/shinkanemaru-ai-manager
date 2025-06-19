@@ -28,7 +28,7 @@ status_html = """
 st.markdown(status_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== 📁 メニュー一覧（ボタン風装飾、実行はしない） =====
+# ===== 📁 メニュー一覧（表示専用） =====
 st.markdown("<h3 style='text-align: center;'>📁 メニュー一覧</h3>", unsafe_allow_html=True)
 
 menu_list = [
@@ -39,16 +39,16 @@ menu_list = [
 
 button_style = """
 display: inline-block;
-background-color: #f1f3f6;
-border: 2px solid #ccc;
+background-color: #f9f9f9;
+border: 2px solid #ddd;
 border-radius: 10px;
-padding: 18px 0;
+padding: 14px 0;
 margin: 10px;
-font-size: 18px;
-font-weight: bold;
+font-size: 17px;
+font-weight: 600;
 text-align: center;
 width: 180px;
-height: 60px;
+box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 """
 
 for i in range(0, 9, 3):
@@ -56,10 +56,7 @@ for i in range(0, 9, 3):
     for j in range(3):
         idx = i + j
         with cols[j]:
-            st.markdown(
-                f"<div style='{button_style}'>{menu_list[idx]}</div>",
-                unsafe_allow_html=True
-            )
+            st.markdown(f"<div style='{button_style}'>{menu_list[idx]}</div>", unsafe_allow_html=True)
 
 # ===== 👤 制作者表記 =====
 st.markdown("<hr>", unsafe_allow_html=True)
