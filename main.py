@@ -2,13 +2,15 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
+# ✅ 追加：⑥設定ページのインポート
+from pages.page6_settings import show_page as show_page6
+
 # ページ設定
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
 # ===== 🕒 日本時間の現在時刻を中央表示 =====
 japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
 formatted_time = japan_time.strftime("%Y年%m月%d日（%a） %H:%M")
-
 st.markdown(f"<h2 style='text-align: center; font-size: 24px;'>{formatted_time}</h2>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -60,6 +62,13 @@ for i in range(0, 9, 3):
                 f"<div style='{button_style}'>{menu_list[i+j]}</div>",
                 unsafe_allow_html=True
             )
+
+# ✅ 追加：URLパラメータによるページ選択処理（簡易）
+query_params = st.experimental_get_query_params()
+selected_menu = query_params.get("page", [None])[0]
+
+if selected_menu == "6":
+    show_page6()
 
 # ===== 👤 制作者表記 =====
 st.markdown("<hr>", unsafe_allow_html=True)
