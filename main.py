@@ -2,24 +2,24 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ✅ 各ページ読み込み
+# ✅ ページ関数の読み込み（ページ名とファイル名を対応）
 from pages.page1_ai_prediction import show_page as show_page1
 from pages.page2_input_result import show_page as show_page2
 from pages.page3_statistics import show_page as show_page3
 from pages.page4_record_result import show_page as show_page4
-from pages.page5_boat_results import show_page as show_page5
+from pages.page5_today_schedule import show_page as show_page5
 from pages.page6_settings import show_page as show_page6
 
-# ===== 📌 ページ設定 =====
+# ===== ページ設定 =====
 st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
-# ===== 🕒 現在時刻（日本時間） =====
+# ===== 日本時間の現在時刻を中央表示 =====
 japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
 formatted_time = japan_time.strftime("%Y年%m月%d日（%a） %H:%M")
 st.markdown(f"<h2 style='text-align: center; font-size: 24px;'>{formatted_time}</h2>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== 📊 ステータス表示 =====
+# ===== ステータス表示 =====
 st.markdown("<h3 style='text-align: center;'>📊 今日のステータス</h3>", unsafe_allow_html=True)
 status_html = """
 <div style='display: flex; justify-content: center;'>
@@ -36,7 +36,7 @@ status_html = """
 st.markdown(status_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== 📁 メニュー一覧（見た目のみボタン風） =====
+# ===== メニュー一覧（見た目だけボタン風） =====
 st.markdown("<h3 style='text-align: center;'>📁 メニュー一覧</h3>", unsafe_allow_html=True)
 
 menu_list = [
@@ -71,7 +71,7 @@ for i in range(0, 9, 3):
 
 st.markdown("---")
 
-# ===== ✅ サイドバーでページ切替 =====
+# ===== サイドバー：ページ切替 =====
 page = st.sidebar.radio("📑 ページ選択", [
     "① AI予想", "② 勝敗入力", "③ 統計データ",
     "④ 結果履歴", "⑤ 開催結果", "⑥ 設定"
@@ -90,6 +90,6 @@ elif page == "⑤ 開催結果":
 elif page == "⑥ 設定":
     show_page6()
 
-# ===== 👤 制作者クレジット =====
+# ===== フッター：制作者表記 =====
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center; font-size: 14px;'>制作：小島崇彦</div>", unsafe_allow_html=True)
