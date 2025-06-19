@@ -1,37 +1,4 @@
-import streamlit as st
-from datetime import datetime
-import pytz
-
-# ✅ ⑥設定ページの関数をインポート
-from pages.page6_settings import show_page as show_page6
-
-# ページ設定
-st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
-
-# ===== 🕒 日本時間の現在時刻を中央表示 =====
-japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
-formatted_time = japan_time.strftime("%Y年%m月%d日（%a） %H:%M")
-st.markdown(f"<h2 style='text-align: center; font-size: 24px;'>{formatted_time}</h2>", unsafe_allow_html=True)
-st.markdown("---")
-
-# ===== 📊 ステータス（中央表示） =====
-st.markdown("<h3 style='text-align: center;'>📊 今日のステータス</h3>", unsafe_allow_html=True)
-status_html = """
-<div style='display: flex; justify-content: center;'>
-  <table style='font-size:18px; border-spacing: 16px;'>
-    <tr><td>🎯 <b>的中率：</b></td><td>85%</td></tr>
-    <tr><td>📈 <b>勝敗：</b></td><td>3勝2敗</td></tr>
-    <tr><td>💰 <b>積立金：</b></td><td>+4,800円</td></tr>
-    <tr><td>🏆 <b>勝率：</b></td><td>70%</td></tr>
-    <tr><td>✅ <b>回収率：</b></td><td>125%</td></tr>
-    <tr><td>🎒 <b>軍資金：</b></td><td>10,000円</td></tr>
-  </table>
-</div>
-"""
-st.markdown(status_html, unsafe_allow_html=True)
-st.markdown("---")
-
-# ===== 📁 メニュー一覧（同サイズボタン） =====
+# ===== 📁 メニュー一覧（見た目だけボタン風） =====
 st.markdown("<h3 style='text-align: center;'>📁 メニュー一覧</h3>", unsafe_allow_html=True)
 
 menu_list = [
@@ -54,21 +21,12 @@ width: 180px;
 height: 60px;
 """
 
-# 🔽 ⑥だけ st.button にしてページ遷移、他は装飾のまま
 for i in range(0, 9, 3):
     cols = st.columns(3)
     for j in range(3):
         idx = i + j
         with cols[j]:
-            if menu_list[idx] == "⑥ 設定 ⚙️":
-                if st.button(menu_list[idx]):
-                    show_page6()
-            else:
-                st.markdown(
-                    f"<div style='{button_style}'>{menu_list[idx]}</div>",
-                    unsafe_allow_html=True
-                )
-
-# ===== 👤 制作者表記 =====
-st.markdown("<hr>", unsafe_allow_html=True)
-st.markdown("<div style='text-align: center; font-size: 14px;'>制作：小島崇彦</div>", unsafe_allow_html=True)
+            st.markdown(
+                f"<div style='{button_style}'>{menu_list[idx]}</div>",
+                unsafe_allow_html=True
+            )
