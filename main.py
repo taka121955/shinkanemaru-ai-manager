@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ✅ 追加：⑥設定ページのインポート
+# ✅ ⑥設定ページの関数をインポート
 from pages.page6_settings import show_page as show_page6
 
 # ページ設定
@@ -54,21 +54,20 @@ width: 180px;
 height: 60px;
 """
 
+# 🔽 ⑥だけ st.button にしてページ遷移、他は装飾のまま
 for i in range(0, 9, 3):
     cols = st.columns(3)
     for j in range(3):
+        idx = i + j
         with cols[j]:
-            st.markdown(
-                f"<div style='{button_style}'>{menu_list[i+j]}</div>",
-                unsafe_allow_html=True
-            )
-
-# ✅ 追加：URLパラメータによるページ選択処理（簡易）
-query_params = st.experimental_get_query_params()
-selected_menu = query_params.get("page", [None])[0]
-
-if selected_menu == "6":
-    show_page6()
+            if menu_list[idx] == "⑥ 設定 ⚙️":
+                if st.button(menu_list[idx]):
+                    show_page6()
+            else:
+                st.markdown(
+                    f"<div style='{button_style}'>{menu_list[idx]}</div>",
+                    unsafe_allow_html=True
+                )
 
 # ===== 👤 制作者表記 =====
 st.markdown("<hr>", unsafe_allow_html=True)
