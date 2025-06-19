@@ -2,8 +2,8 @@ import streamlit as st
 from datetime import datetime
 import pytz
 
-# ページ構成設定
-st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="wide")
+# ページ設定
+st.set_page_config(page_title="新金丸法 × AI資金マネージャー", layout="centered")
 
 # ===== 🕒 日本時間の現在時刻を中央表示 =====
 japan_time = datetime.now(pytz.timezone("Asia/Tokyo"))
@@ -12,68 +12,51 @@ st.markdown(f"<h2 style='text-align: center; font-size: 24px;'>{formatted_time}<
 st.markdown("---")
 
 # ===== 📊 ステータス表示 =====
-st.markdown("<h3 style='text-align: center;'>📊 今日のステータス</h3>", unsafe_allow_html=True)
+st.markdown("### 📊 今日のステータス", unsafe_allow_html=True)
 status_html = """
 <div style='display: flex; justify-content: center;'>
   <table style='font-size:18px; border-spacing: 16px;'>
-    <tr><td>🎯 <b>的中率：</b></td><td>85%</td></tr>
-    <tr><td>📈 <b>勝敗：</b></td><td>3勝2敗</td></tr>
-    <tr><td>💰 <b>積立金：</b></td><td>+4,800円</td></tr>
-    <tr><td>🏆 <b>勝率：</b></td><td>70%</td></tr>
-    <tr><td>✅ <b>回収率：</b></td><td>125%</td></tr>
-    <tr><td>🎒 <b>軍資金：</b></td><td>10,000円</td></tr>
+    <tr><td>🎯 的中率：</td><td>85%</td></tr>
+    <tr><td>📉 勝敗：</td><td>3勝2敗</td></tr>
+    <tr><td>💰 積立金：</td><td>+4,800円</td></tr>
+    <tr><td>🏆 勝率：</td><td>70%</td></tr>
+    <tr><td>✅ 回収率：</td><td>125%</td></tr>
+    <tr><td>🎒 軍資金：</td><td>10,000円</td></tr>
   </table>
 </div>
 """
 st.markdown(status_html, unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== 📁 サイドバー日本語・カラフル対応 =====
-st.sidebar.markdown("## 📋 ページメニュー")
+# ===== 🧭 メニュー一覧はあくまで main.py 内だけに見せる表現（他ページへは遷移しない） =====
+st.markdown("### 📁 メニュー一覧", unsafe_allow_html=True)
 
-menu = st.sidebar.radio("ページを選択してください", [
-    "🏠 メインページ",
-    "① 🔮 AI予想",
-    "② ✍️ 勝敗入力",
-    "③ 📊 統計データ",
-    "④ 📁 結果履歴",
-    "⑤ 🗓️ 開催結果",
-    "⑥ ⚙️ 設定",
-    "⑦ 🏟️ 場別予想",
-    "⑧ 📌 総合評価",
-    "⑨ 💡 特別分析"
-], label_visibility="collapsed")
+menu_list = [
+    "① 🔮 AI予想", "② ✍️ 勝敗入力", "③ 📊 統計データ",
+    "④ 📁 結果履歴", "⑤ 🗓️ 開催結果", "⑥ ⚙️ 設定",
+    "⑦ 🏟️ 場別予想", "⑧ 📌 総合評価", "⑨ 💡 特別分析"
+]
 
-# ===== 🔁 ページ遷移処理（ここでは一部のみ仮に記述）=====
-if menu == "🏠 メインページ":
-    st.info("左のメニューからページを選んでください。")
-elif menu == "① 🔮 AI予想":
-    from pages.page1_ai_prediction import show_page
-    show_page()
-elif menu == "② ✍️ 勝敗入力":
-    from pages.page2_input_result import show_page
-    show_page()
-elif menu == "③ 📊 統計データ":
-    from pages.page3_statistics import show_page
-    show_page()
-elif menu == "④ 📁 結果履歴":
-    from pages.page4_record_result import show_page
-    show_page()
-elif menu == "⑤ 🗓️ 開催結果":
-    from pages.page5_today_schedule import show_page
-    show_page()
-elif menu == "⑥ ⚙️ 設定":
-    from pages.page6_settings import show_page
-    show_page()
-elif menu == "⑦ 🏟️ 場別予想":
-    from pages.page7_per_boatplace_prediction import show_page
-    show_page()
-elif menu == "⑧ 📌 総合評価":
-    from pages.page8_summary_today import show_page
-    show_page()
-elif menu == "⑨ 💡 特別分析":
-    from pages.page9_reflection import show_page
-    show_page()
+button_style = """
+display: inline-block;
+background-color: #f8f9fa;
+border: 1px solid #ccc;
+border-radius: 10px;
+padding: 12px 0;
+margin: 6px;
+font-size: 16px;
+font-weight: bold;
+text-align: center;
+width: 180px;
+box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+"""
+
+for i in range(0, 9, 3):
+    cols = st.columns(3)
+    for j in range(3):
+        idx = i + j
+        with cols[j]:
+            st.markdown(f"<div style='{button_style}'>{menu_list[idx]}</div>", unsafe_allow_html=True)
 
 # ===== 👤 制作者表記 =====
 st.markdown("<hr>", unsafe_allow_html=True)
