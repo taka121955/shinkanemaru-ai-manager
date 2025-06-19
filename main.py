@@ -17,17 +17,17 @@ now = datetime.now(pytz.timezone("Asia/Tokyo"))
 st.markdown(f"<h2 style='text-align: center;'>{now.strftime('%Y年%m月%d日（%a） %H:%M')}</h2>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ===== メニュー定義 =====
+# ===== サイドバー メニュー =====
 menu = st.sidebar.radio("📋 ページ選択", [
     "🏠 メインページ", "① AI予想", "② 勝敗入力", "③ 統計データ",
     "④ 結果履歴", "⑤ 開催結果", "⑥ 設定", "⑦ 場別予想", "⑧ 総合評価", "⑨ 特別分析"
 ], label_visibility="collapsed")
 
-# ===== メインページ表示 =====
+# ===== メインページ =====
 if menu == "🏠 メインページ":
     st.markdown("## 📊 今日のステータス", unsafe_allow_html=True)
 
-    # ▼ 仮データ（あとで自動化OK）
+    # --- 仮のステータス（将来CSVと連携予定） ---
     accuracy = "85%"
     win_text = "3勝2敗"
     wins = 3
@@ -38,10 +38,10 @@ if menu == "🏠 メインページ":
     win_rate = "70%"
     return_rate = "125%"
 
-    # 勝敗色
+    # --- 色分け ---
     win_color = "#007bff" if wins > losses else "#dc3545"
 
-    # ✨ 目標達成演出
+    # --- 目標達成演出（点滅） ---
     flash_html = ""
     if fund_now >= fund_goal:
         flash_html = """
@@ -57,7 +57,7 @@ if menu == "🏠 メインページ":
         </style>
         """
 
-    # ===== Excel風ステータス表 =====
+    # --- Excel風ステータス表 ---
     html_table = f"""
     {flash_html}
     <style>
@@ -87,71 +87,69 @@ if menu == "🏠 メインページ":
     """
     st.markdown(html_table, unsafe_allow_html=True)
 
-    # ===== 📁 メニュー一覧（整列＆ボタン風） =====
+    # ===== メニュー一覧（HTML/CSSボタン風レイアウト） =====
     st.markdown("### 📁 メニュー一覧")
-
     menu_labels = [
         "① AI予想", "② 勝敗入力", "③ 統計データ",
         "④ 結果履歴", "⑤ 開催結果", "⑥ 設定",
         "⑦ 場別予想", "⑧ 総合評価", "⑨ 特別分析"
     ]
 
-    btns = ""
+    # --- HTML＋CSSで整列ボタン表示 ---
+    btn_html = """
+    <style>
+    .menu-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    .menu-btn {
+        display: inline-block;
+        margin: 0 10px;
+        padding: 10px 20px;
+        background-color: #f0f4f8;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        font-weight: bold;
+        color: #1a73e8;
+        font-size: 16px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+    </style>
+    """
     for i, label in enumerate(menu_labels):
         if i % 3 == 0:
-            btns += "<div style='display: flex; justify-content: center; margin-bottom: 10px;'>"
-        btns += f"""
-            <div style='margin: 0 10px;'>
-                <a href='#' style='
-                    display: inline-block;
-                    padding: 10px 20px;
-                    background-color: #f0f4f8;
-                    border-radius: 8px;
-                    border: 1px solid #ccc;
-                    text-decoration: none;
-                    font-weight: bold;
-                    color: #1a73e8;
-                    font-size: 16px;
-                    box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-                '>{label}</a>
-            </div>
-        """
+            btn_html += "<div class='menu-row'>"
+        btn_html += f"<a href='#' class='menu-btn'>{label}</a>"
         if i % 3 == 2 or i == len(menu_labels) - 1:
-            btns += "</div>"
+            btn_html += "</div>"
 
-    st.markdown(btns, unsafe_allow_html=True)
+    st.markdown(btn_html, unsafe_allow_html=True)
 
     st.markdown("---")
     st.info("左のメニューからページを選んでください。")
 
-# ===== その他のページ読み込み（仮） =====
+# ===== 他ページの読み込み処理 =====
 elif menu == "① AI予想":
     from page1_ai_prediction import show_page; show_page()
-
 elif menu == "② 勝敗入力":
     from page2_input_result import show_page; show_page()
-
 elif menu == "③ 統計データ":
     from page3_statistics import show_page; show_page()
-
 elif menu == "④ 結果履歴":
     from page4_record_result import show_page; show_page()
-
 elif menu == "⑤ 開催結果":
     from page5_today_schedule import show_page; show_page()
-
 elif menu == "⑥ 設定":
     from page6_settings import show_page; show_page()
-
 elif menu == "⑦ 場別予想":
     from page7_per_boatplace_prediction import show_page; show_page()
-
 elif menu == "⑧ 総合評価":
     from page8_summary_today import show_page; show_page()
-
 elif menu == "⑨ 特別分析":
     from page9_reflection import show_page; show_page()
 
-# ===== フッター（制作者名） =====
+# ===== フッター =====
 st.markdown("---")
 st.markdown("<div style='text-align: center;'>制作：小島崇彦</div>", unsafe_allow_html=True)
