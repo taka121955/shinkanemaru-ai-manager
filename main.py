@@ -27,7 +27,7 @@ menu = st.sidebar.radio("📋 ページ選択", [
 if menu == "🏠 メインページ":
     st.markdown("## 📊 今日のステータス", unsafe_allow_html=True)
 
-    # --- 仮のステータス（将来CSVと連携予定） ---
+    # --- 仮データ ---
     accuracy = "85%"
     win_text = "3勝2敗"
     wins = 3
@@ -38,7 +38,7 @@ if menu == "🏠 メインページ":
     win_rate = "70%"
     return_rate = "125%"
 
-    # --- 色分け ---
+    # --- 勝敗色分け ---
     win_color = "#007bff" if wins > losses else "#dc3545"
 
     # --- 目標達成演出（点滅） ---
@@ -87,50 +87,59 @@ if menu == "🏠 メインページ":
     """
     st.markdown(html_table, unsafe_allow_html=True)
 
-    # ===== メニュー一覧（HTML/CSSボタン風レイアウト） =====
+    # ===== 📁 メニュー一覧（ボタンサイズ統一） =====
     st.markdown("### 📁 メニュー一覧")
+
     menu_labels = [
         "① AI予想", "② 勝敗入力", "③ 統計データ",
         "④ 結果履歴", "⑤ 開催結果", "⑥ 設定",
         "⑦ 場別予想", "⑧ 総合評価", "⑨ 特別分析"
     ]
 
-    # --- HTML＋CSSで整列ボタン表示 ---
     btn_html = """
     <style>
     .menu-row {
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
         margin-bottom: 10px;
     }
     .menu-btn {
         display: inline-block;
-        margin: 0 10px;
-        padding: 10px 20px;
+        width: 160px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        margin: 6px 10px;
         background-color: #f0f4f8;
-        border-radius: 8px;
-        border: 1px solid #ccc;
+        border-radius: 10px;
+        border: 1.5px solid #ccc;
         text-decoration: none;
         font-weight: bold;
         color: #1a73e8;
         font-size: 16px;
-        box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s ease-in-out;
+    }
+    .menu-btn:hover {
+        transform: translateY(-2px);
+        background-color: #e8f0fe;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
     }
     </style>
+    <div class='menu-row'>
     """
-    for i, label in enumerate(menu_labels):
-        if i % 3 == 0:
-            btn_html += "<div class='menu-row'>"
-        btn_html += f"<a href='#' class='menu-btn'>{label}</a>"
-        if i % 3 == 2 or i == len(menu_labels) - 1:
-            btn_html += "</div>"
 
+    for label in menu_labels:
+        btn_html += f"<a href='#' class='menu-btn'>{label}</a>"
+
+    btn_html += "</div>"
     st.markdown(btn_html, unsafe_allow_html=True)
 
     st.markdown("---")
     st.info("左のメニューからページを選んでください。")
 
-# ===== 他ページの読み込み処理 =====
+# ===== 他のページの読み込み =====
 elif menu == "① AI予想":
     from page1_ai_prediction import show_page; show_page()
 elif menu == "② 勝敗入力":
@@ -150,6 +159,6 @@ elif menu == "⑧ 総合評価":
 elif menu == "⑨ 特別分析":
     from page9_reflection import show_page; show_page()
 
-# ===== フッター =====
+# ===== フッター（制作者名） =====
 st.markdown("---")
 st.markdown("<div style='text-align: center;'>制作：小島崇彦</div>", unsafe_allow_html=True)
