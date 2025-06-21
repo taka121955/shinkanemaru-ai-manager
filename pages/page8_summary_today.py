@@ -1,28 +1,48 @@
 import streamlit as st
 import pandas as pd
+import os
+
+RESULTS_FILE = "results.csv"
 
 def show_page():
     st.markdown("## ⑧ 今日の結果まとめ 📊")
 
-    # 仮の本日成績データ（手動 or 自動連携予定）
-    data = {
-        "競馬場": ["東京", "京都", "阪神", "中山"],
-        "的中数": [2, 1, 3, 0],
-        "購入数": [3, 2, 4, 2],
-        "回収金額": [3200, 1500, 4800, 0],
-        "投資金額": [3000, 2000, 4000, 1500],
-        "回収率": ["107%", "75%", "120%", "0%"]
-    }
+    if not os.path.exists(RESULTS_FILE):
+        st.warning("⚠️ 結果ファイルが見つかりません。")
+        return
 
-    df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True)
+    df = pd.read_csv(RESULTS_FILE)
+
+    # 🔧 自動置換（競馬場→競艇場）
+    df.columns = [col.replace("競馬場", "競艇場") for col in df.columns]
+
+    if df.empty:
+        st.info("📭 まだ記録がありません。")
+        return
+
+    summary = df.groupby("競艇場").agg({
+        "結果": lambda x: (x == "的中").sum(),
+        "払戻": "sum",
+        "賭け金額": ["count", "sum"]
+    })
+
+    summary.columns = ["的中数", "回収金額", "購入数", "投資金額"]
+    summary = summary.reset_index()
+    summary["回収率"] = (summary["回収金額"] / summary["投資金額"] * 100).fillna(0).round(1).astype(str) + "%"
+    summary = summary[["競艇場", "的中数", "購入数", "回収金額", "投資金額", "回収率"]]
+
+    st.dataframe(summary, use_container_width=True)
+
+    total_hits = (df["結果"] == "的中").sum()
+    total_bets = len(df)
+    total_payout = df["払戻"].sum()
+    total_invest = df["賭け金額"].sum()
+
+    accuracy = round((total_hits / total_bets) * 100, 1) if total_bets else 0
+    total_return_rate = round((total_payout / total_invest) * 100, 1) if total_invest else 0
 
     st.markdown("### 📌 本日の合計")
-    total_recover = sum(df["回収金額"])
-    total_invest = sum(df["投資金額"])
-    total_rate = f"{round(total_recover / total_invest * 100)}%" if total_invest else "0%"
-
-    st.markdown(f"- 🎯 総的中率： {round(df['的中数'].sum() / df['購入数'].sum() * 100)}%")
-    st.markdown(f"- 💰 合計回収金額： {total_recover} 円")
-    st.markdown(f"- 💸 合計投資金額： {total_invest} 円")
-    st.markdown(f"- 📈 トータル回収率： {total_rate}")
+    st.markdown(f"- 🎯 総的中率：**{accuracy}%**")
+    st.markdown(f"- 💰 合計回収金額：**{int(total_payout):,} 円**")
+    st.markdown(f"- 💸 合計投資金額：**{int(total_invest):,} 円**")
+    st.markdown(f"- 📈 トータル回収率：**{total_return_rate}%**")
